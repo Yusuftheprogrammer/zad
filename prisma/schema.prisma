@@ -1,0 +1,125 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  password      String?   // ضروري إذا كنت ستستخدم Credentials Provider
+  role          Role      @default(STUDENT)
+  
+  admin         Admin?
+  teacher       Teacher?
+  student       Student?
+  parent        Parent?
+
+  accounts      Account[]
+  sessions      Session[]
+}
+
+enum Role {
+  ADMIN
+  TEACHER
+  STUDENT
+  PARENT
+}
+
+
+model Admin {
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Teacher {
+  id        String     @id @default(cuid())
+  userId    String     @unique
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subjects  Subject[]  
+  homeworks Homework[] 
+}
+
+model Student {
+  id        String     @id @default(cuid())
+  userId    String     @unique
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  parentId  String?
+  parent    Parent?    @relation(fields: [parentId], references: [id])
+  submissions Submission[] 
+}
+
+model Parent {
+  id       String    @id @default(cuid())
+  userId   String    @unique
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  students Student[]
+}
+
+
+model Subject {
+  id        String     @id @default(cuid())
+  name      String
+  teacherId String
+  teacher   Teacher    @relation(fields: [teacherId], references: [id])
+  homeworks Homework[]
+}
+
+model Homework {
+  id          String       @id @default(cuid())
+  title       String
+  description String
+  dueDate     DateTime
+  subjectId   String
+  subject     Subject      @relation(fields: [subjectId], references: [id])
+  teacherId   String
+  teacher     Teacher      @relation(fields: [teacherId], references: [id])
+  submissions Submission[]
+}
+
+model Submission {
+  id         String   @id @default(cuid())
+  content    String   
+  grade      Float?
+  status     String   @default("SUBMITTED") // PENDING, GRADED
+  homeworkId String
+  homework   Homework @relation(fields: [homeworkId], references: [id])
+  studentId  String
+  student    Student  @relation(fields: [studentId], references: [id])
+  createdAt  DateTime @default(now())
+}
+
+model Account {
+  id                 String  @id @default(cuid())
+  userId             String
+  type               String
+  provider           String
+  providerAccountId  String
+  refresh_token      String?  @db.Text
+  access_token       String?  @db.Text
+  expires_at         Int?
+  user               User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
