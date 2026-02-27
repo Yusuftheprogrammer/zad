@@ -1,17 +1,22 @@
+/**
+ * Dashboard home: redirect student/teacher to their section, show welcome.
+ */
+import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../api/auth/[...nextauth]/route";
-import { redirect } from "next/navigation";
-import bcrypt from "bcrypt";
 
+export default async function DashboardPage() {
+  const session = await getServerSession(authOptions);
+  if (!session?.user) redirect("/login");
 
-export default async function Dashboard() {
-    const session: any = await getServerSession(authOptions);
+  const role = session.user.role;
+  if (role === "STUDENT") redirect("/dashboard/student/homework");
+  if (role === "TEACHER") redirect("/dashboard/teacher/homework");
 
-    const pass = await bcrypt.hash("hellowrold", 10);
-
-    console.log(pass);
-
-    return (
-        <div>{session}</div>
-    )
-};
+  return (
+    <div>
+      <h1 className="text-xl font-semibold">Dashboard</h1>
+      <p className="text-muted-foreground">Welcome, {session.user.name ?? session.user.email}.</p>
+    </div>
+  );
+}

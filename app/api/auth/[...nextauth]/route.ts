@@ -1,3 +1,7 @@
+/**
+ * NextAuth handler: Credentials (email + password), JWT session with user id and role.
+ * Used by getServerSession(authOptions) and protect dashboard APIs via lib/auth.
+ */
 import NextAuth, { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcrypt";
@@ -10,9 +14,8 @@ declare module "next-auth" {
     user: {
       id: string;
       role: Role;
-      name: string;
-      email: string;
-      password: string;
+      name?: string | null;
+      email?: string | null;
     };
   }
 

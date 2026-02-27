@@ -50,17 +50,19 @@ model Teacher {
   id        String     @id @default(cuid())
   userId    String     @unique
   user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  subjects  Subject[]  
-  homeworks Homework[] 
+  subjects  Subject[]
+  homeworks Homework[]
+  exams     Exam[]
 }
 
 model Student {
-  id        String     @id @default(cuid())
-  userId    String     @unique
-  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  parentId  String?
-  parent    Parent?    @relation(fields: [parentId], references: [id])
-  submissions Submission[] 
+  id           String        @id @default(cuid())
+  userId       String        @unique
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  parentId     String?
+  parent       Parent?       @relation(fields: [parentId], references: [id])
+  submissions  Submission[]
+  examAttempts ExamAttempt[]
 }
 
 model Parent {
@@ -72,11 +74,13 @@ model Parent {
 
 
 model Subject {
-  id        String     @id @default(cuid())
+  id        String    @id @default(cuid())
   name      String
   teacherId String
-  teacher   Teacher    @relation(fields: [teacherId], references: [id])
+  teacher   Teacher   @relation(fields: [teacherId], references: [id])
   homeworks Homework[]
+  lessons   Lesson[]
+  exams     Exam[]
 }
 
 model Homework {
@@ -93,14 +97,59 @@ model Homework {
 
 model Submission {
   id         String   @id @default(cuid())
-  content    String   
+  content    String
   grade      Float?
   status     String   @default("SUBMITTED") // PENDING, GRADED
   homeworkId String
-  homework   Homework @relation(fields: [homeworkId], references: [id])
+  homework   Homework @relation(fields: [homeworkId], references: [id], onDelete: Cascade)
   studentId  String
-  student    Student  @relation(fields: [studentId], references: [id])
+  student    Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
   createdAt  DateTime @default(now())
+}
+
+// Lesson: belongs to a subject, created by teacher (via subject)
+model Lesson {
+  id         String   @id @default(cuid())
+  title      String
+  content    String   @db.Text
+  orderIndex Int      @default(0) // for ordering lessons in a subject
+  subjectId  String
+  subject    Subject  @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+// Exam: belongs to subject and teacher; students take it via ExamAttempt
+model Exam {
+  id          String        @id @default(cuid())
+  title       String
+  description String?       @db.Text
+  durationMinutes Int       @default(60)
+  dueDate     DateTime
+  subjectId   String
+  subject     Subject       @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  teacherId   String
+  teacher     Teacher       @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  attempts    ExamAttempt[]
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+}
+
+// ExamAttempt: student's attempt at an exam (submission + optional grade)
+model ExamAttempt {
+  id        String   @id @default(cuid())
+  examId    String
+  exam      Exam     @relation(fields: [examId], references: [id], onDelete: Cascade)
+  studentId String
+  student   Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  score     Float?
+  status    String   @default("SUBMITTED") // DRAFT, SUBMITTED, GRADED
+  answers   String?  @db.Text // JSON or plain text answers for MVP
+  submittedAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([examId, studentId])
 }
 
 model Account {
