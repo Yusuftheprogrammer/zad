@@ -21,7 +21,7 @@ export async function getSession() {
 }
 
 /**
- * Require auth: returns session or null. Use in API routes to check auth.
+ * Require auth: returns session or null. Used in API routes to check auth.
  */
 export async function requireAuth() {
   const session = await getSession();
