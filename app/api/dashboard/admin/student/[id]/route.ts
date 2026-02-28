@@ -76,14 +76,14 @@ export async function PATCH(
   if (body.parentId !== undefined) studentData.parentId = body.parentId === "" ? null : body.parentId;
 
   if (studentData.gradeId) {
-    const grade = await prisma.grade.findUnique({ where: { id: studentData.gradeId } });
+    const grade = await (prisma as any).grade.findUnique({ where: { id: studentData.gradeId } });
     if (!grade) return Response.json({ error: "Grade not found" }, { status: 404 });
   }
   if (studentData.classId) {
-    const classRecord = await prisma.class.findFirst({
+    const classRecord = await (prisma as any).class.findFirst({
       where: {
         id: studentData.classId,
-        gradeId: studentData.gradeId ?? student.gradeId,
+        gradeId: studentData.gradeId ?? (student as any).gradeId,
       },
     });
     if (!classRecord) return Response.json({ error: "Class not found or does not belong to grade" }, { status: 404 });
@@ -112,8 +112,6 @@ export async function PATCH(
     where: { id },
     include: {
       user: { select: { id: true, name: true, email: true, role: true } },
-      class: { select: { id: true, name: true } },
-      grade: { select: { id: true, name: true } },
       parent: { include: { user: { select: { id: true, name: true, email: true } } } },
     },
   });
