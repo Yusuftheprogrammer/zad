@@ -23,10 +23,10 @@ model User {
   password      String?
   role          Role      @default(STUDENT)
 
-  admin    Admin?
-  teacher  Teacher?
-  student  Student?
-  parent   Parent?
+  admin   Admin?
+  teacher Teacher?
+  student Student?
+  parent  Parent?
 
   accounts Account[]
   sessions Session[]
@@ -39,9 +39,9 @@ model Admin {
 }
 
 model Teacher {
-  id        String  @id @default(cuid())
-  userId    String  @unique
-  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   assignments TeachingAssignment[]
   homeworks   Homework[]
@@ -49,18 +49,18 @@ model Teacher {
 }
 
 model Student {
-  id           String        @id @default(cuid())
-  userId       String        @unique
-  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  parentId     String?
-  parent       Parent?       @relation(fields: [parentId], references: [id])
+  parentId String?
+  parent   Parent? @relation(fields: [parentId], references: [id])
 
-  gradeId      String
-  grade        Grade         @relation(fields: [gradeId], references: [id])
+  gradeId String
+  grade   Grade  @relation(fields: [gradeId], references: [id])
 
-  classId      String
-  class        Class         @relation(fields: [classId], references: [id])
+  classId String
+  class   Class  @relation(fields: [classId], references: [id])
 
   submissions  Submission[]
   examAttempts ExamAttempt[]
@@ -74,25 +74,25 @@ model Parent {
 }
 
 model Grade {
-  id      String  @id @default(cuid())
-  name    String
+  id   String @id @default(cuid())
+  name String
 
-  classes Class[]
+  classes  Class[]
   students Student[]
 }
 
 model Class {
-  id      String  @id @default(cuid())
-  name    String
+  id   String @id @default(cuid())
+  name String
 
   gradeId String
-  grade   Grade   @relation(fields: [gradeId], references: [id], onDelete: Cascade)
+  grade   Grade  @relation(fields: [gradeId], references: [id], onDelete: Cascade)
 
-  students     Student[]
-  assignments  TeachingAssignment[]
-  homeworks    Homework[]
-  lessons      Lesson[]
-  exams        Exam[]
+  students    Student[]
+  assignments TeachingAssignment[]
+  homeworks   Homework[]
+  lessons     Lesson[]
+  exams       Exam[]
 }
 
 model Subject {
@@ -106,7 +106,7 @@ model Subject {
 }
 
 model TeachingAssignment {
-  id        String  @id @default(cuid())
+  id String @id @default(cuid())
 
   teacherId String
   teacher   Teacher @relation(fields: [teacherId], references: [id], onDelete: Cascade)
@@ -114,26 +114,26 @@ model TeachingAssignment {
   subjectId String
   subject   Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
 
-  classId   String
-  class     Class   @relation(fields: [classId], references: [id], onDelete: Cascade)
+  classId String
+  class   Class  @relation(fields: [classId], references: [id], onDelete: Cascade)
 
   @@unique([teacherId, subjectId, classId])
 }
 
 model Lesson {
-  id         String   @id @default(cuid())
+  id         String @id @default(cuid())
   title      String
-  content    String   @db.Text
-  orderIndex Int      @default(0)
+  content    String @db.Text
+  orderIndex Int    @default(0)
 
-  subjectId  String
-  subject    Subject  @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  subjectId String
+  subject   Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
 
-  classId    String
-  class      Class    @relation(fields: [classId], references: [id], onDelete: Cascade)
+  classId String
+  class   Class  @relation(fields: [classId], references: [id], onDelete: Cascade)
 
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Homework {
@@ -142,85 +142,103 @@ model Homework {
   description String   @db.Text
   dueDate     DateTime
 
-  subjectId   String
-  subject     Subject  @relation(fields: [subjectId], references: [id])
+  subjectId String
+  subject   Subject @relation(fields: [subjectId], references: [id])
 
-  teacherId   String
-  teacher     Teacher  @relation(fields: [teacherId], references: [id])
+  teacherId String
+  teacher   Teacher @relation(fields: [teacherId], references: [id])
 
-  classId     String
-  class       Class    @relation(fields: [classId], references: [id], onDelete: Cascade)
+  classId String
+  class   Class  @relation(fields: [classId], references: [id], onDelete: Cascade)
 
   submissions Submission[]
 }
 
 model Submission {
-  id         String   @id @default(cuid())
-  content    String   @db.Text
-  grade      Float?
-  status     String   @default("SUBMITTED")
+  id      String @id @default(cuid())
+  content String @db.Text
+  grade   Float?
+  status  String @default("SUBMITTED")
 
   homeworkId String
   homework   Homework @relation(fields: [homeworkId], references: [id], onDelete: Cascade)
 
-  studentId  String
-  student    Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  studentId String
+  student   Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
 
-  createdAt  DateTime @default(now())
+  createdAt DateTime @default(now())
 }
 
 model Exam {
-  id          String   @id @default(cuid())
-  title       String
-  description String?  @db.Text
-  durationMinutes Int  @default(60)
-  dueDate     DateTime
+  id              String   @id @default(cuid())
+  title           String
+  description     String?  @db.Text
+  durationMinutes Int      @default(60)
+  dueDate         DateTime
 
-  subjectId   String
-  subject     Subject  @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  subjectId String
+  subject   Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
 
-  teacherId   String
-  teacher     Teacher  @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  teacherId String
+  teacher   Teacher @relation(fields: [teacherId], references: [id], onDelete: Cascade)
 
-  classId     String
-  class       Class    @relation(fields: [classId], references: [id], onDelete: Cascade)
+  classId String
+  class   Class  @relation(fields: [classId], references: [id], onDelete: Cascade)
 
-  attempts    ExamAttempt[]
+  attempts ExamAttempt[]
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model ExamAttempt {
-  id        String   @id @default(cuid())
+  id String @id @default(cuid())
 
-  examId    String
-  exam      Exam     @relation(fields: [examId], references: [id], onDelete: Cascade)
+  examId String
+  exam   Exam   @relation(fields: [examId], references: [id], onDelete: Cascade)
 
   studentId String
-  student   Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  student   Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
 
-  score     Float?
-  status    String   @default("SUBMITTED")
-  answers   String?  @db.Text
+  score   Float?
+  status  String  @default("SUBMITTED")
+  answers String? @db.Text
 
   submittedAt DateTime?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
   @@unique([examId, studentId])
 }
 
+model mcqQuestions {
+  id String @id @default(cuid())
+
+  title           String
+  order           Int
+  numberOfOptions Int    @default(4)
+
+  options Options[]
+}
+
+model Options {
+  id         String       @id @default(cuid())
+  title      String
+  isCorrect  Boolean      @default(false)
+  questionId String
+  question   mcqQuestions @relation(fields: [questionId], references: [id], onDelete: Cascade)
+}
+
 /* NextAuth */
 model Account {
-  id                 String  @id @default(cuid())
-  userId             String
-  type               String
-  provider           String
-  providerAccountId  String
-  refresh_token      String?  @db.Text
-  access_token       String?  @db.Text
-  expires_at         Int?
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 

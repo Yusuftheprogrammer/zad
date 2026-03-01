@@ -2,7 +2,15 @@
 
 import { useEffect, useState } from "react";
 
-type Subject = { id: string; name: string };
+type TeacherSubjectAssignment = {
+  assignmentId: string;
+  subjectId: string;
+  subjectName: string;
+  classId: string;
+  className: string;
+  label: string;
+};
+
 type Exam = {
   id: string;
   title: string;
@@ -10,12 +18,13 @@ type Exam = {
   durationMinutes: number;
   dueDate: string;
   subject: { id: string; name: string };
+  class: { id: string; name: string };
   _count: { attempts: number };
 };
 
 export function TeacherExamList() {
   const [exams, setExams] = useState<Exam[]>([]);
-  const [subjects, setSubjects] = useState<Subject[]>([]);
+  const [subjects, setSubjects] = useState<TeacherSubjectAssignment[]>([]);
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
 
@@ -23,10 +32,12 @@ export function TeacherExamList() {
     Promise.all([
       fetch("/api/dashboard/teacher/exams").then((r) => (r.ok ? r.json() : [])),
       fetch("/api/dashboard/teacher/subjects").then((r) => (r.ok ? r.json() : [])),
-    ]).then(([ex, sub]) => {
-      setExams(ex);
-      setSubjects(sub);
-    }).finally(() => setLoading(false));
+    ])
+      .then(([ex, sub]) => {
+        setExams(ex);
+        setSubjects(sub);
+      })
+      .finally(() => setLoading(false));
   }
 
   useEffect(() => {
@@ -39,9 +50,17 @@ export function TeacherExamList() {
     const form = e.currentTarget;
     const title = (form.elements.namedItem("title") as HTMLInputElement).value;
     const description = (form.elements.namedItem("description") as HTMLTextAreaElement).value;
-    const durationMinutes = parseInt((form.elements.namedItem("durationMinutes") as HTMLInputElement).value, 10) || 60;
+    const durationMinutes =
+      parseInt((form.elements.namedItem("durationMinutes") as HTMLInputElement).value, 10) || 60;
     const dueDate = (form.elements.namedItem("dueDate") as HTMLInputElement).value;
-    const subjectId = (form.elements.namedItem("subjectId") as HTMLSelectElement).value;
+    const assignmentId = (form.elements.namedItem("assignmentId") as HTMLSelectElement).value;
+    const assignment = subjects.find((s) => s.assignmentId === assignmentId);
+
+    if (!assignment) {
+      setCreating(false);
+      return;
+    }
+
     const res = await fetch("/api/dashboard/teacher/exams", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -50,7 +69,8 @@ export function TeacherExamList() {
         description: description || undefined,
         durationMinutes,
         dueDate: dueDate || new Date().toISOString().slice(0, 10),
-        subjectId,
+        subjectId: assignment.subjectId,
+        classId: assignment.classId,
       }),
     });
     setCreating(false);
@@ -66,14 +86,14 @@ export function TeacherExamList() {
     if (res.ok) load();
   }
 
-  if (loading) return <p className="text-muted-foreground">Loading…</p>;
+  if (loading) return <p className="text-muted-foreground">Loading...</p>;
 
   return (
     <div className="space-y-6">
       <div className="rounded-lg border bg-card p-4">
         <h2 className="mb-3 font-medium">Create exam</h2>
         {subjects.length === 0 ? (
-          <p className="text-sm text-muted-foreground">Create a subject first.</p>
+          <p className="text-sm text-muted-foreground">No assigned subjects found for this teacher.</p>
         ) : (
           <form onSubmit={handleCreate} className="flex flex-col gap-3">
             <input
@@ -88,15 +108,17 @@ export function TeacherExamList() {
               rows={2}
               className="rounded border border-input bg-background px-3 py-2 text-sm"
             />
-            <div className="flex gap-2 flex-wrap">
+            <div className="flex flex-wrap gap-2">
               <select
-                name="subjectId"
+                name="assignmentId"
                 required
                 className="rounded border border-input bg-background px-3 py-2 text-sm"
               >
-                <option value="">Subject</option>
+                <option value="">Subject and class</option>
                 {subjects.map((s) => (
-                  <option key={s.id} value={s.id}>{s.name}</option>
+                  <option key={s.assignmentId} value={s.assignmentId}>
+                    {s.label}
+                  </option>
                 ))}
               </select>
               <input
@@ -118,7 +140,7 @@ export function TeacherExamList() {
               disabled={creating}
               className="w-fit rounded bg-primary px-4 py-2 text-sm text-primary-foreground disabled:opacity-50"
             >
-              {creating ? "Creating…" : "Create"}
+              {creating ? "Creating..." : "Create"}
             </button>
           </form>
         )}
@@ -130,7 +152,7 @@ export function TeacherExamList() {
             <div>
               <h3 className="font-medium">{e.title}</h3>
               <p className="text-sm text-muted-foreground">
-                {e.subject.name} · {e.durationMinutes} min · Due {new Date(e.dueDate).toLocaleDateString()} · {e._count.attempts} attempts
+                {e.subject.name} - {e.class.name} - {e.durationMinutes} min - Due {new Date(e.dueDate).toLocaleDateString()} - {e._count.attempts} attempts
               </p>
             </div>
             <button

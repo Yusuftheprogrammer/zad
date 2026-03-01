@@ -2,16 +2,16 @@
  * Dashboard home: redirect student/teacher to their section, show welcome.
  */
 import { redirect } from "next/navigation";
-import { getServerSession } from "next-auth";
-import { authOptions } from "../api/auth/[...nextauth]/route";
+import { requireAuth } from "@/lib/auth";
 
 export default async function DashboardPage() {
-  const session = await getServerSession(authOptions);
+  const session = await requireAuth();
   if (!session?.user) redirect("/login");
 
   const role = session.user.role;
   if (role === "STUDENT") redirect("/dashboard/student/homework");
   if (role === "TEACHER") redirect("/dashboard/teacher/homework");
+  if (role === "ADMIN") redirect("/dashboard/admin");
 
   return (
     <div>

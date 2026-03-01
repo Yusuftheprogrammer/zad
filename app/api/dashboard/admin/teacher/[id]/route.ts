@@ -73,9 +73,9 @@ export async function PATCH(
     }
 
     if (body.assignments !== undefined) {
-      await (tx as any).teachingAssignment.deleteMany({ where: { teacherId: id } });
+      await tx.teachingAssignment.deleteMany({ where: { teacherId: id } });
       for (const a of body.assignments) {
-        await (tx as any).teachingAssignment.create({
+        await tx.teachingAssignment.create({
           data: { teacherId: id, classId: a.classId, subjectId: a.subjectId },
         });
       }

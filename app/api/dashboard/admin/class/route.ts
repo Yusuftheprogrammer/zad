@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const gradeId = searchParams.get("gradeId");
 
-  const classes = await (prisma as any).class.findMany({
+  const classes = await prisma.class.findMany({
     where: gradeId ? { gradeId } : undefined,
     orderBy: [{ gradeId: "asc" }, { name: "asc" }],
   });
@@ -38,10 +38,10 @@ export async function POST(request: NextRequest) {
     return Response.json({ error: "name and gradeId are required" }, { status: 400 });
   }
 
-  const grade = await (prisma as any).grade.findUnique({ where: { id: gradeId } });
+  const grade = await prisma.grade.findUnique({ where: { id: gradeId } });
   if (!grade) return Response.json({ error: "Grade not found" }, { status: 404 });
 
-  const created = await (prisma as any).class.create({
+  const created = await prisma.class.create({
     data: { name: name.trim(), gradeId },
   });
   return Response.json(created, { status: 201 });

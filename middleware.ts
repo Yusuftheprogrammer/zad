@@ -16,14 +16,9 @@ export async function middleware(request: NextRequest) {
   const isLogin = request.nextUrl.pathname === "/login";
   const isSignUp = request.nextUrl.pathname === "/signup";
 
-  // Allow login/signup without auth
-  if (isLogin || isSignUp) {
-    if (token) {
-      // Already logged in: redirect to dashboard
-      return NextResponse.redirect(new URL("/dashboard", request.url));
-    }
-    return NextResponse.next();
-  }
+  // Always allow login/signup.
+  // We do redirects in server components after DB-backed auth checks.
+  if (isLogin || isSignUp) return NextResponse.next();
 
   // Protect dashboard: require auth
   if (isDashboard && !token) {

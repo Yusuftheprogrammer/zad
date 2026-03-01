@@ -9,7 +9,12 @@ import { prisma } from "@/lib/prisma";
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
+    const body: {
+      name?: string;
+      email?: string;
+      password?: string;
+      role?: "STUDENT" | "TEACHER";
+    } = await request.json();
     const { name, email, password, role = "STUDENT" } = body;
 
     if (!email || !password) {
@@ -31,23 +36,39 @@ export async function POST(request: NextRequest) {
 
     const hashed = await bcrypt.hash(password, 10);
 
-    const user = await prisma.user.create({
-      data: {
-        name: name ?? null,
-        email,
-        password: hashed,
-        role,
-      },
-    });
+    const user = await prisma.$transaction(async (tx) => {
+      const createdUser = await tx.user.create({
+        data: {
+          name: name ?? null,
+          email,
+          password: hashed,
+          role,
+        },
+      });
 
-    // Create role profile so login and relations work
-    if (role === "STUDENT") {
-      await prisma.student.create({ data: { userId: user.id } });
-    } else if (role === "TEACHER") {
-      await prisma.teacher.create({ data: { userId: user.id } });
-    } else if (role === "ADMIN") {
-      await prisma.admin.create({ data: { userId: user.id } });
-    }
+      // Student now requires gradeId + classId in schema.
+      if (role === "STUDENT") {
+        const firstClass = await tx.class.findFirst({
+          orderBy: { name: "asc" },
+          select: { id: true, gradeId: true },
+        });
+        if (!firstClass) {
+          throw new Error("NO_CLASSES_CONFIGURED");
+        }
+
+        await tx.student.create({
+          data: {
+            userId: createdUser.id,
+            gradeId: firstClass.gradeId,
+            classId: firstClass.id,
+          },
+        });
+      } else {
+        await tx.teacher.create({ data: { userId: createdUser.id } });
+      }
+
+      return createdUser;
+    });
 
     return Response.json({
       id: user.id,
@@ -55,7 +76,13 @@ export async function POST(request: NextRequest) {
       name: user.name,
       role: user.role,
     });
-  } catch (e) {
+  } catch (e: unknown) {
+    if (e instanceof Error && e.message === "NO_CLASSES_CONFIGURED") {
+      return Response.json(
+        { error: "No classes are configured yet. Please contact an admin." },
+        { status: 400 }
+      );
+    }
     console.error("Signup error:", e);
     return Response.json(
       { error: "Registration failed" },

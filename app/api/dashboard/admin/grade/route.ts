@@ -3,25 +3,22 @@
  */
 import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { requireAuth, requireRole } from "@/lib/auth";
+import { quickAuth } from "@/lib/auth";
 
 export async function GET() {
-  const forbidden = await requireRole("ADMIN");
+  const forbidden = await quickAuth("ADMIN");
   if (forbidden) return forbidden;
-  const session = await requireAuth();
-  if (!session) return Response.json({ error: "Unauthorized" }, { status: 401 });
 
-  const grades = await (prisma as any).grade.findMany({
+  const grades = await prisma.grade.findMany({
     orderBy: { name: "asc" },
   });
   return Response.json(grades);
 }
 
 export async function POST(request: NextRequest) {
-  const forbidden = await requireRole("ADMIN");
+  const forbidden = await quickAuth("ADMIN");
   if (forbidden) return forbidden;
-  const session = await requireAuth();
-  if (!session) return Response.json({ error: "Unauthorized" }, { status: 401 });
+
 
   let body: { name?: string };
   try {
@@ -32,8 +29,8 @@ export async function POST(request: NextRequest) {
   const name = body.name?.trim();
   if (!name) return Response.json({ error: "name is required" }, { status: 400 });
 
-  const grade = await (prisma as any).grade.create({
+  const grade = await prisma.grade.create({
     data: { name },
   });
-  return Response.json(grade, { status: 201 });
+  return Response.json({ grade, message: "Grade added successfully" }, { status: 201 });
 }

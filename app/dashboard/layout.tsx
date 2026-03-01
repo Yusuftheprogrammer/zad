@@ -2,22 +2,18 @@
  * Dashboard layout: redirects by role (student/teacher), shows nav and sign out.
  */
 import { redirect } from "next/navigation";
-import { getServerSession } from "next-auth";
-import { authOptions } from "../api/auth/[...nextauth]/route";
 import Link from "next/link";
+import { requireAuth } from "@/lib/auth";
 
 export default async function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const session = await getServerSession(authOptions);
+  const session = await requireAuth();
   if (!session?.user) redirect("/login");
 
   const role = session.user.role;
-
-  // Role-based default redirect (only when hitting /dashboard exactly)
-  // Child routes like /dashboard/student/homework are handled by their pages
 
   return (
     <div className="min-h-screen bg-background">
@@ -41,13 +37,18 @@ export default async function DashboardLayout({
                 <Link href="/dashboard/teacher/lessons">Lessons</Link>
               </>
             )}
+            {role === "ADMIN" && (
+              <>
+                <Link href="/dashboard/admin">Admin Panel</Link>
+              </>
+            )}
           </nav>
           <div className="flex items-center gap-2">
             <span className="text-sm text-muted-foreground">{session.user.email}</span>
             <span className="rounded bg-muted px-2 py-0.5 text-xs">{role}</span>
-            <a href="/api/auth/signout" className="text-sm text-muted-foreground hover:text-foreground">
+            <Link href="/api/auth/signout" className="text-sm text-muted-foreground hover:text-foreground">
               Sign out
-            </a>
+            </Link>
           </div>
         </div>
       </header>

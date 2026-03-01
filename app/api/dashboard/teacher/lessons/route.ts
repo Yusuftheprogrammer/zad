@@ -21,14 +21,29 @@ export async function GET(request: NextRequest) {
 
   const { searchParams } = new URL(request.url);
   const subjectId = searchParams.get("subjectId");
+  const classId = searchParams.get("classId");
+
+  const assignments = await prisma.teachingAssignment.findMany({
+    where: {
+      teacherId: teacher.id,
+      ...(subjectId ? { subjectId } : {}),
+      ...(classId ? { classId } : {}),
+    },
+    select: { subjectId: true, classId: true },
+  });
+  if (assignments.length === 0) return Response.json([]);
+
+  const pairFilters = assignments.map((assignment) => ({
+    subjectId: assignment.subjectId,
+    classId: assignment.classId,
+  }));
 
   const lessons = await prisma.lesson.findMany({
-    where: subjectId
-      ? { subjectId, subject: { teacherId: teacher.id } }
-      : { subject: { teacherId: teacher.id } },
-    orderBy: [{ subjectId: "asc" }, { orderIndex: "asc" }],
+    where: pairFilters.length === 1 ? pairFilters[0] : { OR: pairFilters },
+    orderBy: [{ subjectId: "asc" }, { classId: "asc" }, { orderIndex: "asc" }],
     include: {
       subject: { select: { id: true, name: true } },
+      class: { select: { id: true, name: true } },
     },
   });
 
@@ -47,14 +62,14 @@ export async function POST(request: NextRequest) {
   });
   if (!teacher) return Response.json({ error: "Teacher profile not found" }, { status: 403 });
 
-  let body: { title?: string; content?: string; subjectId?: string; orderIndex?: number };
+  let body: { title?: string; content?: string; subjectId?: string; classId?: string; orderIndex?: number };
   try {
     body = await request.json();
   } catch {
     return Response.json({ error: "Invalid JSON" }, { status: 400 });
   }
 
-  const { title, content, subjectId, orderIndex } = body;
+  const { title, content, subjectId, classId, orderIndex } = body;
   if (!title || !subjectId) {
     return Response.json(
       { error: "title and subjectId are required" },
@@ -62,18 +77,31 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const subject = await prisma.subject.findFirst({
-    where: { id: subjectId, teacherId: teacher.id },
+  const assignments = await prisma.teachingAssignment.findMany({
+    where: {
+      teacherId: teacher.id,
+      subjectId,
+      ...(classId ? { classId } : {}),
+    },
+    select: { classId: true },
   });
-  if (!subject) {
+  if (assignments.length === 0) {
     return Response.json({ error: "Subject not found or not yours" }, { status: 404 });
   }
+  if (!classId && assignments.length > 1) {
+    return Response.json(
+      { error: "classId is required when this subject is assigned to multiple classes" },
+      { status: 400 }
+    );
+  }
+  const resolvedClassId = assignments[0].classId;
 
   const lesson = await prisma.lesson.create({
     data: {
       title,
       content: content ?? "",
       subjectId,
+      classId: resolvedClassId,
       orderIndex: orderIndex ?? 0,
     },
   });
