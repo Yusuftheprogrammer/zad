@@ -4,14 +4,25 @@ import { requireAuth, requireRole } from "@/lib/auth";
 
 
 
-export async function GET(request: NextRequest) {
+export async function GET() {
     const forbidden = await requireRole("ADMIN");
     if (forbidden) return forbidden;
 
     const session = await requireAuth();
     if (!session) return Response.json({ error: "Unauthorized" }, { status: 401 });
 
-    const teachers = await prisma.teacher.findMany();
+    const teachers = await prisma.teacher.findMany({
+        orderBy: { id: "asc" },
+        include: {
+            user: { select: { id: true, name: true, email: true, role: true } },
+            assignments: {
+                include: {
+                    subject: { select: { id: true, name: true } },
+                    class: { select: { id: true, name: true } },
+                },
+            },
+        },
+    });
     return Response.json(teachers);
 
 }
@@ -56,7 +67,7 @@ export async function POST(request: NextRequest) {
                 }
             });
             if (!user.teacher) throw new Error("Teacher not created");
-            await (tx as any).teachingAssignment.create({
+            await tx.teachingAssignment.create({
                 data: {
                     teacherId: user.teacher.id,
                     classId: body.classId,
@@ -68,9 +79,14 @@ export async function POST(request: NextRequest) {
 
         return Response.json({ message: "Teacher created successfully", data: newTeacherUser }, { status: 201 });
 
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error("Creation Error:", error);
-        if (error.code === 'P2002') {
+        if (
+            typeof error === "object" &&
+            error !== null &&
+            "code" in error &&
+            error.code === "P2002"
+        ) {
             return Response.json({ error: "Email already exists" }, { status: 400 });
         }
         return Response.json({ error: "Something went wrong" }, { status: 500 });

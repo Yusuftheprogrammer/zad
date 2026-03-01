@@ -2,13 +2,12 @@
  * Signup page: create account (Student or Teacher), then redirect to login.
  */
 import { redirect } from "next/navigation";
-import { getServerSession } from "next-auth";
-import { authOptions } from "../api/auth/[...nextauth]/route";
 import { SignupForm } from "./signup-form";
+import { requireAuth } from "@/lib/auth";
 
 export default async function SignupPage() {
-  const session = await getServerSession(authOptions);
-  if (session) redirect("/dashboard");
+  const session = await requireAuth();
+  if (session?.user) redirect("/dashboard");
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-muted/30">

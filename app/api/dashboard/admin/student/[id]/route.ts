@@ -21,10 +21,8 @@ export async function GET(
     where: { id },
     include: {
       user: { select: { id: true, name: true, email: true, role: true } },
-      ...(typeof (prisma as any).class !== "undefined" && {
-        class: { select: { id: true, name: true } },
-        grade: { select: { id: true, name: true } },
-      }),
+      class: { select: { id: true, name: true } },
+      grade: { select: { id: true, name: true } },
       parent: { include: { user: { select: { id: true, name: true, email: true } } } },
     },
   });
@@ -112,8 +110,6 @@ export async function PATCH(
     where: { id },
     include: {
       user: { select: { id: true, name: true, email: true, role: true } },
-      class: { select: { id: true, name: true } },
-      grade: { select: { id: true, name: true } },
       parent: { include: { user: { select: { id: true, name: true, email: true } } } },
     },
   });

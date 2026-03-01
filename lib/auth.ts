@@ -4,6 +4,8 @@
  */
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { Role } from "@/generated/prisma/enums";
+import { prisma } from "@/lib/prisma";
 
 /** Session user type (no password in session) */
 export type SessionUser = {
@@ -17,7 +19,20 @@ export type SessionUser = {
  * Get current session. Returns null if not authenticated.
  */
 export async function getSession() {
-  return getServerSession(authOptions);
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.id) return null;
+
+  const dbUser = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: { id: true, role: true, name: true, email: true },
+  });
+  if (!dbUser) return null;
+
+  session.user.id = dbUser.id;
+  session.user.role = dbUser.role as SessionUser["role"];
+  session.user.name = dbUser.name;
+  session.user.email = dbUser.email;
+  return session;
 }
 
 /**
@@ -47,13 +62,24 @@ export async function requireRole(
 /**
  * Require one of the given roles.
  */
-export async function requireRoles(
-  roles: SessionUser["role"][]
-): Promise<Response | null> {
+
+// i will comment it until we actually use it
+// export async function requireRoles(
+//   roles: SessionUser["role"][]
+// ): Promise<Response | null> {
+//   const session = await requireAuth();
+//   if (!session)
+//     return Response.json({ error: "Unauthorized" }, { status: 401 });
+//   if (!roles.includes(session.user.role as SessionUser["role"]))
+//     return Response.json({ error: "Forbidden" }, { status: 403 });
+//   return null;
+// }
+
+
+
+export async function quickAuth(role: Role) {
+  const forbidden = await requireRole(role);
+  if (forbidden) return forbidden;
   const session = await requireAuth();
-  if (!session)
-    return Response.json({ error: "Unauthorized" }, { status: 401 });
-  if (!roles.includes(session.user.role as SessionUser["role"]))
-    return Response.json({ error: "Forbidden" }, { status: 403 });
-  return null;
+  if (!session) return Response.json({ error: "Unauthorized" }, { status: 401 });
 }

@@ -5,14 +5,11 @@
  */
 import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { requireAuth, requireRole } from "@/lib/auth";
+import { quickAuth, requireAuth, requireRole } from "@/lib/auth";
 
 export async function GET() {
-  const forbidden = await requireRole("STUDENT");
+  const forbidden = await quickAuth("STUDENT");
   if (forbidden) return forbidden;
-
-  const session = await requireAuth();
-  if (!session) return Response.json({ error: "Unauthorized" }, { status: 401 });
 
   const exams = await prisma.exam.findMany({
     orderBy: { dueDate: "asc" },

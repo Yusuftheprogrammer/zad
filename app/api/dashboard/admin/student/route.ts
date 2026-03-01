@@ -6,7 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { requireAuth, requireRole } from "@/lib/auth";
 
 /** GET /api/dashboard/admin/student – list all students with user, class, grade */
-export async function GET(_request: NextRequest) {
+export async function GET() {
   const forbidden = await requireRole("ADMIN");
   if (forbidden) return forbidden;
 
@@ -17,7 +17,9 @@ export async function GET(_request: NextRequest) {
     orderBy: { id: "asc" },
     include: {
       user: { select: { id: true, name: true, email: true, role: true } },
-      parent: { select: { id: true }, include: { user: { select: { name: true, email: true } } } },
+      grade: { select: { id: true, name: true } },
+      class: { select: { id: true, name: true } },
+      parent: { include: { user: { select: { id: true, name: true, email: true } } } },
     },
   });
 
@@ -60,10 +62,10 @@ export async function POST(request: NextRequest) {
     return Response.json({ error: "Email already exists" }, { status: 409 });
   }
 
-  const grade = await (prisma as any).grade?.findUnique({ where: { id: gradeId } });
+  const grade = await prisma.grade.findUnique({ where: { id: gradeId } });
   if (!grade) return Response.json({ error: "Grade not found" }, { status: 404 });
 
-  const classRecord = await (prisma as any).class?.findFirst({
+  const classRecord = await prisma.class.findFirst({
     where: { id: classId, gradeId },
   });
   if (!classRecord) return Response.json({ error: "Class not found or does not belong to grade" }, { status: 404 });
@@ -84,7 +86,7 @@ export async function POST(request: NextRequest) {
           gradeId,
           classId,
           parentId: parentId && parentId !== "" ? parentId : null,
-        } as any,
+        },
       },
     },
     include: { student: true },

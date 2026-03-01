@@ -2,13 +2,12 @@
  * Login page: email + password form, redirects to dashboard on success.
  */
 import { redirect } from "next/navigation";
-import { getServerSession } from "next-auth";
-import { authOptions } from "../api/auth/[...nextauth]/route";
 import { LoginForm } from "./login-form";
+import { requireAuth } from "@/lib/auth";
 
 export default async function LoginPage() {
-  const session = await getServerSession(authOptions);
-  if (session) redirect("/dashboard");
+  const session = await requireAuth();
+  if (session?.user) redirect("/dashboard");
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-muted/30">

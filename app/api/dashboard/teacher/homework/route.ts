@@ -25,6 +25,7 @@ export async function GET() {
     orderBy: { dueDate: "asc" },
     include: {
       subject: { select: { id: true, name: true } },
+      class: { select: { id: true, name: true } },
       _count: { select: { submissions: true } },
     },
   });
@@ -45,14 +46,14 @@ export async function POST(request: NextRequest) {
   });
   if (!teacher) return Response.json({ error: "Teacher profile not found" }, { status: 403 });
 
-  let body: { title?: string; description?: string; dueDate?: string; subjectId?: string };
+  let body: { title?: string; description?: string; dueDate?: string; subjectId?: string; classId?: string };
   try {
     body = await request.json();
   } catch {
     return Response.json({ error: "Invalid JSON" }, { status: 400 });
   }
 
-  const { title, description, dueDate, subjectId } = body;
+  const { title, description, dueDate, subjectId, classId } = body;
   if (!title || !subjectId) {
     return Response.json(
       { error: "title and subjectId are required" },
@@ -61,12 +62,24 @@ export async function POST(request: NextRequest) {
   }
 
   // Ensure subject belongs to this teacher
-  const subject = await prisma.subject.findFirst({
-    where: { id: subjectId, teacherId: teacher.id },
+  const assignments = await prisma.teachingAssignment.findMany({
+    where: {
+      teacherId: teacher.id,
+      subjectId,
+      ...(classId ? { classId } : {}),
+    },
+    select: { classId: true },
   });
-  if (!subject) {
+  if (assignments.length === 0) {
     return Response.json({ error: "Subject not found or not yours" }, { status: 404 });
   }
+  if (!classId && assignments.length > 1) {
+    return Response.json(
+      { error: "classId is required when this subject is assigned to multiple classes" },
+      { status: 400 }
+    );
+  }
+  const resolvedClassId = assignments[0].classId;
 
   const homework = await prisma.homework.create({
     data: {
@@ -75,6 +88,7 @@ export async function POST(request: NextRequest) {
       dueDate: dueDate ? new Date(dueDate) : new Date(),
       subjectId,
       teacherId: teacher.id,
+      classId: resolvedClassId,
     },
   });
 
