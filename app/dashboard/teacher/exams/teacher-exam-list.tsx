@@ -1,6 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Loader2, Plus, Trash2 } from "lucide-react";
+import { StatusMessage } from "@/components/ui/status-message";
+import { ToastMessage, type ToastType } from "@/components/ui/toast-message";
 
 type TeacherSubjectAssignment = {
   assignmentId: string;
@@ -27,8 +30,12 @@ export function TeacherExamList() {
   const [subjects, setSubjects] = useState<TeacherSubjectAssignment[]>([]);
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [toast, setToast] = useState<{ type: ToastType; message: string } | null>(null);
 
   function load() {
+    setError(null);
     Promise.all([
       fetch("/api/dashboard/teacher/exams").then((r) => (r.ok ? r.json() : [])),
       fetch("/api/dashboard/teacher/subjects").then((r) => (r.ok ? r.json() : [])),
@@ -37,6 +44,7 @@ export function TeacherExamList() {
         setExams(ex);
         setSubjects(sub);
       })
+      .catch(() => setError("Failed to load exams data"))
       .finally(() => setLoading(false));
   }
 
@@ -58,6 +66,7 @@ export function TeacherExamList() {
 
     if (!assignment) {
       setCreating(false);
+      setToast({ type: "error", message: "Please select subject and class" });
       return;
     }
 
@@ -76,20 +85,32 @@ export function TeacherExamList() {
     setCreating(false);
     if (res.ok) {
       form.reset();
+      setToast({ type: "success", message: "Exam created successfully" });
       load();
+    } else {
+      setToast({ type: "error", message: "Failed to create exam" });
     }
   }
 
   async function handleDelete(id: string) {
     if (!confirm("Delete this exam?")) return;
+    setDeletingId(id);
     const res = await fetch(`/api/dashboard/teacher/exams/${id}`, { method: "DELETE" });
-    if (res.ok) load();
+    setDeletingId(null);
+    if (res.ok) {
+      setToast({ type: "success", message: "Exam deleted successfully" });
+      load();
+    } else {
+      setToast({ type: "error", message: "Failed to delete exam" });
+    }
   }
 
-  if (loading) return <p className="text-muted-foreground">Loading...</p>;
+  if (loading) return <StatusMessage variant="loading" message="Loading exams..." />;
+  if (error) return <StatusMessage variant="error" message={error} />;
 
   return (
     <div className="space-y-6">
+      {toast && <ToastMessage type={toast.type} message={toast.message} onClose={() => setToast(null)} />}
       <div className="rounded-lg border bg-card p-4">
         <h2 className="mb-3 font-medium">Create exam</h2>
         {subjects.length === 0 ? (
@@ -138,8 +159,9 @@ export function TeacherExamList() {
             <button
               type="submit"
               disabled={creating}
-              className="w-fit rounded bg-primary px-4 py-2 text-sm text-primary-foreground disabled:opacity-50"
+              className="inline-flex w-fit items-center gap-2 rounded bg-primary px-4 py-2 text-sm text-primary-foreground disabled:opacity-50"
             >
+              {creating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
               {creating ? "Creating..." : "Create"}
             </button>
           </form>
@@ -158,14 +180,16 @@ export function TeacherExamList() {
             <button
               type="button"
               onClick={() => handleDelete(e.id)}
-              className="text-sm text-destructive hover:underline"
+              disabled={deletingId === e.id || creating}
+              className="inline-flex items-center gap-1 text-sm text-destructive hover:underline"
             >
-              Delete
+              <Trash2 className="h-4 w-4" />
+              {deletingId === e.id ? "Deleting..." : "Delete"}
             </button>
           </li>
         ))}
       </ul>
-      {exams.length === 0 && <p className="text-muted-foreground">No exams yet.</p>}
+      {exams.length === 0 && <StatusMessage variant="empty" message="No exams yet." />}
     </div>
   );
 }

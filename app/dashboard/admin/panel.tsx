@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { requestJson } from "./api";
 import { Notice, Grade, Parent, SchoolClass, Student, Subject, Teacher } from "./types";
 import { NoticeBanner } from "./components/notice-banner";
+import { StatusMessage } from "@/components/ui/status-message";
 import { GradesSection } from "./components/grades-section";
 import { ClassesSection } from "./components/classes-section";
 import { SubjectsSection } from "./components/subjects-section";
@@ -22,9 +23,9 @@ export function AdminPanel() {
   const [saving, setSaving] = useState(false);
   const [notice, setNotice] = useState<Notice>(null);
 
-  async function loadAll() {
+  async function loadAll(clearNotice = true) {
     setLoading(true);
-    setNotice(null);
+    if (clearNotice) setNotice(null);
     try {
       const [g, c, s, p, st, t] = await Promise.all([
         requestJson<Grade[]>("/api/dashboard/admin/grade"),
@@ -57,7 +58,7 @@ export function AdminPanel() {
     try {
       await task();
       setNotice({ type: "success", message: successMessage });
-      await loadAll();
+      await loadAll(false);
     } catch (error) {
       setNotice({ type: "error", message: error instanceof Error ? error.message : "Operation failed" });
     } finally {
@@ -71,10 +72,10 @@ export function AdminPanel() {
 
   return (
     <div className="space-y-6">
-      <NoticeBanner notice={notice} />
+      <NoticeBanner notice={notice} onClose={() => setNotice(null)} />
 
       {loading ? (
-        <p className="text-sm text-muted-foreground">Loading admin data...</p>
+        <StatusMessage variant="loading" message="Loading admin data..." />
       ) : (
         <>
           <GradesSection

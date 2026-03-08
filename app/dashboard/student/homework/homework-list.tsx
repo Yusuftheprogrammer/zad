@@ -4,6 +4,9 @@
  * Fetches homework from student API and renders list; inline submit form for MVP.
  */
 import { useEffect, useState } from "react";
+import { Loader2, Send } from "lucide-react";
+import { StatusMessage } from "@/components/ui/status-message";
+import { ToastMessage, type ToastType } from "@/components/ui/toast-message";
 
 type Homework = {
   id: string;
@@ -19,6 +22,7 @@ export function HomeworkList() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState<string | null>(null);
+  const [toast, setToast] = useState<{ type: ToastType; message: string } | null>(null);
 
   useEffect(() => {
     fetch("/api/dashboard/student/homework")
@@ -42,29 +46,32 @@ export function HomeworkList() {
     if (res.ok) {
       form.reset();
       setError(null);
+      setToast({ type: "success", message: "Homework submitted successfully" });
     } else {
       const data = await res.json().catch(() => ({}));
-      setError(data.error ?? "Submit failed");
+      const message = data.error ?? "Submit failed";
+      setError(message);
+      setToast({ type: "error", message });
     }
   }
 
-  if (loading) return <p className="text-muted-foreground">Loading…</p>;
-  if (error) return <p className="text-destructive">{error}</p>;
-  if (list.length === 0) return <p className="text-muted-foreground">No homework assigned.</p>;
+  if (loading) return <StatusMessage variant="loading" message="Loading homework..." />;
+  if (error) return <StatusMessage variant="error" message={error} />;
+  if (list.length === 0) return <StatusMessage variant="empty" message="No homework assigned." />;
 
   return (
-    <ul className="space-y-4">
+    <div className="space-y-4">
+      {toast && <ToastMessage type={toast.type} message={toast.message} onClose={() => setToast(null)} />}
+      <ul className="space-y-4">
       {list.map((h) => (
         <li key={h.id} className="rounded-lg border bg-card p-4">
           <div className="flex justify-between gap-2">
             <div>
               <h2 className="font-medium">{h.title}</h2>
               <p className="text-sm text-muted-foreground">
-                {h.subject.name} · Due {new Date(h.dueDate).toLocaleDateString()}
+                {h.subject.name} - Due {new Date(h.dueDate).toLocaleDateString()}
               </p>
-              {h.description && (
-                <p className="mt-2 text-sm">{h.description}</p>
-              )}
+              {h.description && <p className="mt-2 text-sm">{h.description}</p>}
             </div>
           </div>
           <form onSubmit={(e) => handleSubmit(e, h.id)} className="mt-3">
@@ -76,14 +83,16 @@ export function HomeworkList() {
             />
             <button
               type="submit"
-              disabled={!!submitting}
-              className="mt-2 rounded bg-primary px-3 py-1 text-sm text-primary-foreground disabled:opacity-50"
+              disabled={submitting === h.id}
+              className="mt-2 inline-flex items-center gap-2 rounded bg-primary px-3 py-1 text-sm text-primary-foreground disabled:opacity-50"
             >
-              {submitting === h.id ? "Submitting…" : "Submit"}
+              {submitting === h.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+              {submitting === h.id ? "Submitting..." : "Submit"}
             </button>
           </form>
         </li>
       ))}
-    </ul>
+      </ul>
+    </div>
   );
 }

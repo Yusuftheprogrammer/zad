@@ -3,7 +3,9 @@
  */
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import { LogOut } from "lucide-react";
 import { requireAuth } from "@/lib/auth";
+import ThemeToggle from "@/components/ThemeToggle";
 
 export default async function DashboardLayout({
   children,
@@ -44,9 +46,14 @@ export default async function DashboardLayout({
             )}
           </nav>
           <div className="flex items-center gap-2">
+            <ThemeToggle />
             <span className="text-sm text-muted-foreground">{session.user.email}</span>
             <span className="rounded bg-muted px-2 py-0.5 text-xs">{role}</span>
-            <Link href="/api/auth/signout" className="text-sm text-muted-foreground hover:text-foreground">
+            <Link
+              href="/api/auth/signout"
+              className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
+            >
+              <LogOut className="h-4 w-4" />
               Sign out
             </Link>
           </div>

@@ -4,6 +4,7 @@
 import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAuth, requireRole } from "@/lib/auth";
+import bcrypt from "bcrypt";
 
 export async function GET() {
   const forbidden = await requireRole("ADMIN");
@@ -29,6 +30,7 @@ export async function POST(request: NextRequest) {
   let body: { name?: string; email: string; password: string };
   try {
     body = await request.json();
+    body.password = await bcrypt.hash(body.password, 10);
   } catch {
     return Response.json({ error: "Invalid JSON" }, { status: 400 });
   }
@@ -44,7 +46,7 @@ export async function POST(request: NextRequest) {
     data: {
       name: name ?? null,
       email,
-      password,
+      password: await bcrypt.hash(password, 10),
       role: "PARENT",
       parent: { create: {} },
     },

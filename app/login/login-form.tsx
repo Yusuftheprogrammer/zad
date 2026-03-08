@@ -6,6 +6,7 @@
 import { signIn } from "next-auth/react";
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { Loader2, LogIn } from "lucide-react";
 
 export function LoginForm() {
   const router = useRouter();
@@ -58,9 +59,10 @@ export function LoginForm() {
       <button
         type="submit"
         disabled={loading}
-        className="mt-2 rounded bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90 disabled:opacity-50"
+        className="mt-2 inline-flex items-center justify-center gap-2 rounded bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90 disabled:opacity-50"
       >
-        {loading ? "Signing in…" : "Sign in"}
+        {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <LogIn className="h-4 w-4" />}
+        {loading ? "Signing in..." : "Sign in"}
       </button>
     </form>
   );

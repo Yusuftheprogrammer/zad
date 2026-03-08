@@ -16,8 +16,21 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const subjectId = searchParams.get("subjectId");
 
+  const student = await prisma.student.findUnique({
+    where: { userId: session.user.id },
+    select: { classId: true },
+  });
+
+  if (!student?.classId) {
+    return Response.json({ error: "Student class not found" }, { status: 403 });
+  }
+
+
+
   const lessons = await prisma.lesson.findMany({
-    where: subjectId ? { subjectId } : {},
+    where: {...(subjectId ? { subjectId } : {}),
+      classId: student.classId
+    },
     orderBy: [{ subjectId: "asc" }, { orderIndex: "asc" }],
     include: {
       subject: { select: { id: true, name: true } },

@@ -4,6 +4,7 @@
 import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAuth, requireRole } from "@/lib/auth";
+import bcrypt from "bcrypt";
 
 /** GET /api/dashboard/admin/student/[id] – get one student with user, class, grade, parent */
 export async function GET(
@@ -59,6 +60,9 @@ export async function PATCH(
   };
   try {
     body = await request.json();
+    if (body.password) {
+      body.password = await bcrypt.hash(body.password, 10);
+    }
   } catch {
     return Response.json({ error: "Invalid JSON" }, { status: 400 });
   }
@@ -66,7 +70,9 @@ export async function PATCH(
   const userData: { name?: string; email?: string; password?: string } = {};
   if (body.name !== undefined) userData.name = body.name;
   if (body.email !== undefined) userData.email = body.email;
-  if (body.password !== undefined && body.password.length > 0) userData.password = body.password;
+  if (body.password !== undefined && body.password.length > 0) {
+    userData.password = await bcrypt.hash(body.password, 10);
+  }
 
   const studentData: { gradeId?: string; classId?: string; parentId?: string | null } = {};
   if (body.gradeId !== undefined) studentData.gradeId = body.gradeId;

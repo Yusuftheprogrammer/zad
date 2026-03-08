@@ -1,4 +1,5 @@
 import { FormEvent, useMemo, useState } from "react";
+import { Plus, Trash2 } from "lucide-react";
 import { Grade, Parent, SchoolClass, Student } from "../types";
 import { AdminSection } from "./admin-section";
 
@@ -92,7 +93,8 @@ export function StudentsSection({ grades, classes, parents, students, saving, on
             </option>
           ))}
         </select>
-        <button disabled={saving} className="rounded bg-primary px-3 py-2 text-sm text-primary-foreground md:col-span-3">
+        <button disabled={saving} className="inline-flex items-center justify-center gap-1 rounded bg-primary px-3 py-2 text-sm text-primary-foreground md:col-span-3">
+          <Plus className="h-4 w-4" />
           Add Student
         </button>
       </form>
@@ -103,7 +105,8 @@ export function StudentsSection({ grades, classes, parents, students, saving, on
               {student.user.name ?? "Unnamed"} ({student.user.email}) - {student.grade.name}/{student.class.name}
               {student.parent ? ` - Parent: ${student.parent.user.name ?? student.parent.user.email}` : ""}
             </span>
-            <button disabled={saving} className="text-destructive" onClick={() => onDelete(student.id)}>
+            <button disabled={saving} className="inline-flex items-center gap-1 text-destructive" onClick={() => onDelete(student.id)}>
+              <Trash2 className="h-4 w-4" />
               Delete
             </button>
           </li>

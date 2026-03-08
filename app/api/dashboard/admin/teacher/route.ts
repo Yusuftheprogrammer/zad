@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAuth, requireRole } from "@/lib/auth";
+import bcrypt from "bcrypt";
 
 
 
@@ -39,31 +40,29 @@ export async function POST(request: NextRequest) {
         name: string; 
         email: string; 
         password: string; 
-        classId: string; // The class that the admin has selected
-        subjectId: string; // The subject that the admin has selected
+        classId: string;
+        subjectId: string;
     };
 
     try {
         body = await request.json();
+        body.password = await bcrypt.hash(body.password, 10);
     } catch {
         return Response.json({ error: "Invalid JSON" }, { status: 400 });
     }
 
     try {
-        // using transaction to prevent partial creation
         const newTeacherUser = await prisma.$transaction(async (tx) => {
-            // 1. create user with role teacher
             const user = await tx.user.create({
                 data: {
                     name: body.name,
                     email: body.email,
-                    password: body.password, // it's better to hash the password before saving
+                    password: body.password,
                     role: "TEACHER",
-                    // 2. create record in teacher table and link it to the user
                     teacher: { create: {} }
                 },
                 include: {
-                    teacher: true // to retrive teacher data in the response
+                    teacher: true
                 }
             });
             if (!user.teacher) throw new Error("Teacher not created");

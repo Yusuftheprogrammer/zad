@@ -15,9 +15,15 @@ export async function GET(
   const session = await requireAuth();
   if (!session) return Response.json({ error: "Unauthorized" }, { status: 401 });
 
+  const student = await prisma.student.findUnique({
+    where: { userId: session.user.id },
+    select: { classId: true },
+  });
+  if (!student) return Response.json({ error: "Student profile not found" }, { status: 403 });
+
   const { id } = await params;
-  const lesson = await prisma.lesson.findUnique({
-    where: { id },
+  const lesson = await prisma.lesson.findFirst({
+    where: { id, classId: student.classId },
     include: {
       subject: { select: { id: true, name: true } },
     },

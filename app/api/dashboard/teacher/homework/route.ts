@@ -26,7 +26,7 @@ export async function GET() {
     include: {
       subject: { select: { id: true, name: true } },
       class: { select: { id: true, name: true } },
-      _count: { select: { submissions: true } },
+      _count: { select: { submissions: true } }
     },
   });
 

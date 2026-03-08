@@ -4,6 +4,7 @@
 import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAuth, requireRole } from "@/lib/auth";
+import bcrypt from "bcrypt";
 
 export async function GET(
   _req: NextRequest,
@@ -44,13 +45,18 @@ export async function PATCH(
   let body: { name?: string; email?: string; password?: string };
   try {
     body = await request.json();
+    if (body.password) {
+      body.password = await bcrypt.hash(body.password, 10);
+    }
   } catch {
     return Response.json({ error: "Invalid JSON" }, { status: 400 });
   }
   const userData: { name?: string; email?: string; password?: string } = {};
   if (body.name !== undefined) userData.name = body.name;
   if (body.email !== undefined) userData.email = body.email;
-  if (body.password !== undefined && body.password.length > 0) userData.password = body.password;
+  if (body.password !== undefined && body.password.length > 0) {
+    userData.password = await bcrypt.hash(body.password, 10);
+  }
 
   if (Object.keys(userData).length === 0) {
     const current = await prisma.parent.findUnique({

@@ -15,8 +15,16 @@ export async function GET() {
   const session = await requireAuth();
   if (!session) return Response.json({ error: "Unauthorized" }, { status: 401 });
 
-  // Fetch student profile to scope by subjects later; for MVP return all homework with subject/teacher
+  const student = await prisma.student.findUnique({
+    where: { userId: session.user.id },
+    select: { classId: true },
+  });
+  if (!student) {
+    return Response.json({ error: "Student profile not found" }, { status: 403 });
+  }
+
   const homework = await prisma.homework.findMany({
+    where: { classId: student.classId },
     orderBy: { dueDate: "asc" },
     include: {
       subject: {
@@ -61,13 +69,14 @@ export async function POST(request: NextRequest) {
 
   const student = await prisma.student.findUnique({
     where: { userId: session.user.id },
+    select: { id: true, classId: true },
   });
   if (!student) {
     return Response.json({ error: "Student profile not found" }, { status: 403 });
   }
 
-  const homework = await prisma.homework.findUnique({
-    where: { id: homeworkId },
+  const homework = await prisma.homework.findFirst({
+    where: { id: homeworkId, classId: student.classId },
   });
   if (!homework) {
     return Response.json({ error: "Homework not found" }, { status: 404 });
@@ -83,14 +92,33 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const submission = await prisma.submission.create({
-    data: {
-      homeworkId,
-      studentId: student.id,
-      content: String(content),
-      status: "SUBMITTED",
-    },
-  });
+  let submission;
+  try {
+    submission = await prisma.submission.create({
+      data: {
+        homeworkId,
+        studentId: student.id,
+        content: String(content),
+        status: "SUBMITTED",
+      },
+    });
+  } catch (error: unknown) {
+    if (
+      typeof error === "object" &&
+      error !== null &&
+      "code" in error &&
+      error.code === "P2002"
+    ) {
+      return Response.json(
+        { error: "You already submitted this homework" },
+        { status: 409 }
+      );
+    }
+    return Response.json(
+      { error: "Failed to create submission" },
+      { status: 500 }
+    );
+  }
 
   return Response.json(submission);
 }

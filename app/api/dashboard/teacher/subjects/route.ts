@@ -9,9 +9,6 @@ export async function GET() {
   const session = await requireAuth();
   if (!session) return Response.json({ error: "Unauthorized" }, { status: 401 });
 
-  const adminSHash = await bcrypt.hash("helloworld", 10);
-  console.log(adminSHash)
-
   const teacher = await prisma.teacher.findUnique({
     where: { userId: session.user.id },
   });

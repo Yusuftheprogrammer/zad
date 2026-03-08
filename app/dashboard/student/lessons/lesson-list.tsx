@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { StatusMessage } from "@/components/ui/status-message";
 
 type Lesson = {
   id: string;
@@ -24,9 +25,9 @@ export function LessonList() {
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <p className="text-muted-foreground">Loading…</p>;
-  if (error) return <p className="text-destructive">{error}</p>;
-  if (list.length === 0) return <p className="text-muted-foreground">No lessons.</p>;
+  if (loading) return <StatusMessage variant="loading" message="Loading lessons..." />;
+  if (error) return <StatusMessage variant="error" message={error} />;
+  if (list.length === 0) return <StatusMessage variant="empty" message="No lessons." />;
 
   return (
     <ul className="space-y-3">

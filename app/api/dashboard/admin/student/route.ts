@@ -4,6 +4,7 @@
 import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAuth, requireRole } from "@/lib/auth";
+import bcrypt from "bcrypt";
 
 /** GET /api/dashboard/admin/student – list all students with user, class, grade */
 export async function GET() {
@@ -79,7 +80,7 @@ export async function POST(request: NextRequest) {
     data: {
       name: name ?? null,
       email,
-      password,
+      password: await bcrypt.hash(password, 10),
       role: "STUDENT",
       student: {
         create: {

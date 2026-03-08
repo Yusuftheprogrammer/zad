@@ -1,6 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Loader2, Plus, Trash2 } from "lucide-react";
+import { StatusMessage } from "@/components/ui/status-message";
+import { ToastMessage, type ToastType } from "@/components/ui/toast-message";
 
 type TeacherSubjectAssignment = {
   assignmentId: string;
@@ -25,8 +28,12 @@ export function TeacherLessonList() {
   const [subjects, setSubjects] = useState<TeacherSubjectAssignment[]>([]);
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [toast, setToast] = useState<{ type: ToastType; message: string } | null>(null);
 
   function load() {
+    setError(null);
     Promise.all([
       fetch("/api/dashboard/teacher/lessons").then((r) => (r.ok ? r.json() : [])),
       fetch("/api/dashboard/teacher/subjects").then((r) => (r.ok ? r.json() : [])),
@@ -35,6 +42,7 @@ export function TeacherLessonList() {
         setLessons(less);
         setSubjects(sub);
       })
+      .catch(() => setError("Failed to load lessons data"))
       .finally(() => setLoading(false));
   }
 
@@ -53,6 +61,7 @@ export function TeacherLessonList() {
 
     if (!assignment) {
       setCreating(false);
+      setToast({ type: "error", message: "Please select subject and class" });
       return;
     }
 
@@ -69,20 +78,32 @@ export function TeacherLessonList() {
     setCreating(false);
     if (res.ok) {
       form.reset();
+      setToast({ type: "success", message: "Lesson created successfully" });
       load();
+    } else {
+      setToast({ type: "error", message: "Failed to create lesson" });
     }
   }
 
   async function handleDelete(id: string) {
     if (!confirm("Delete this lesson?")) return;
+    setDeletingId(id);
     const res = await fetch(`/api/dashboard/teacher/lessons/${id}`, { method: "DELETE" });
-    if (res.ok) load();
+    setDeletingId(null);
+    if (res.ok) {
+      setToast({ type: "success", message: "Lesson deleted successfully" });
+      load();
+    } else {
+      setToast({ type: "error", message: "Failed to delete lesson" });
+    }
   }
 
-  if (loading) return <p className="text-muted-foreground">Loading...</p>;
+  if (loading) return <StatusMessage variant="loading" message="Loading lessons..." />;
+  if (error) return <StatusMessage variant="error" message={error} />;
 
   return (
     <div className="space-y-6">
+      {toast && <ToastMessage type={toast.type} message={toast.message} onClose={() => setToast(null)} />}
       <div className="rounded-lg border bg-card p-4">
         <h2 className="mb-3 font-medium">Create lesson</h2>
         {subjects.length === 0 ? (
@@ -116,8 +137,9 @@ export function TeacherLessonList() {
             <button
               type="submit"
               disabled={creating}
-              className="w-fit rounded bg-primary px-4 py-2 text-sm text-primary-foreground disabled:opacity-50"
+              className="inline-flex w-fit items-center gap-2 rounded bg-primary px-4 py-2 text-sm text-primary-foreground disabled:opacity-50"
             >
+              {creating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
               {creating ? "Creating..." : "Create"}
             </button>
           </form>
@@ -136,14 +158,16 @@ export function TeacherLessonList() {
             <button
               type="button"
               onClick={() => handleDelete(l.id)}
-              className="text-sm text-destructive hover:underline"
+              disabled={deletingId === l.id || creating}
+              className="inline-flex items-center gap-1 text-sm text-destructive hover:underline"
             >
-              Delete
+              <Trash2 className="h-4 w-4" />
+              {deletingId === l.id ? "Deleting..." : "Delete"}
             </button>
           </li>
         ))}
       </ul>
-      {lessons.length === 0 && <p className="text-muted-foreground">No lessons yet.</p>}
+      {lessons.length === 0 && <StatusMessage variant="empty" message="No lessons yet." />}
     </div>
   );
 }

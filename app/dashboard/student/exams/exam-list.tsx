@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { StatusMessage } from "@/components/ui/status-message";
 
 type Exam = {
   id: string;
@@ -24,9 +25,9 @@ export function ExamList() {
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <p className="text-muted-foreground">Loading…</p>;
-  if (error) return <p className="text-destructive">{error}</p>;
-  if (list.length === 0) return <p className="text-muted-foreground">No exams.</p>;
+  if (loading) return <StatusMessage variant="loading" message="Loading exams..." />;
+  if (error) return <StatusMessage variant="error" message={error} />;
+  if (list.length === 0) return <StatusMessage variant="empty" message="No exams." />;
 
   return (
     <ul className="space-y-3">
@@ -34,7 +35,7 @@ export function ExamList() {
         <li key={e.id} className="rounded-lg border bg-card p-4">
           <h2 className="font-medium">{e.title}</h2>
           <p className="text-sm text-muted-foreground">
-            {e.subject.name} · {e.durationMinutes} min · Due {new Date(e.dueDate).toLocaleDateString()}
+            {e.subject.name} - {e.durationMinutes} min - Due {new Date(e.dueDate).toLocaleDateString()}
           </p>
           {e.description && <p className="mt-2 text-sm">{e.description}</p>}
           <a

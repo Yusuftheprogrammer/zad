@@ -1,4 +1,5 @@
 import { FormEvent } from "react";
+import { Plus, Trash2 } from "lucide-react";
 import { Parent } from "../types";
 import { AdminSection } from "./admin-section";
 
@@ -27,7 +28,8 @@ export function ParentsSection({ parents, saving, onCreate, onDelete }: Props) {
         <input name="name" placeholder="Name" className="rounded border px-3 py-2 text-sm" />
         <input name="email" placeholder="Email" type="email" className="rounded border px-3 py-2 text-sm" />
         <input name="password" placeholder="Password" type="password" className="rounded border px-3 py-2 text-sm" />
-        <button disabled={saving} className="rounded bg-primary px-3 py-2 text-sm text-primary-foreground">
+        <button disabled={saving} className="inline-flex items-center gap-1 rounded bg-primary px-3 py-2 text-sm text-primary-foreground">
+          <Plus className="h-4 w-4" />
           Add Parent
         </button>
       </form>
@@ -37,7 +39,8 @@ export function ParentsSection({ parents, saving, onCreate, onDelete }: Props) {
             <span>
               {parent.user.name ?? "Unnamed"} ({parent.user.email})
             </span>
-            <button disabled={saving} className="text-destructive" onClick={() => onDelete(parent.id)}>
+            <button disabled={saving} className="inline-flex items-center gap-1 text-destructive" onClick={() => onDelete(parent.id)}>
+              <Trash2 className="h-4 w-4" />
               Delete
             </button>
           </li>

@@ -15,9 +15,15 @@ export async function GET(
   const session = await requireAuth();
   if (!session) return Response.json({ error: "Unauthorized" }, { status: 401 });
 
+  const student = await prisma.student.findUnique({
+    where: { userId: session.user.id },
+    select: { id: true, classId: true },
+  });
+  if (!student) return Response.json({ error: "Student profile not found" }, { status: 403 });
+
   const { id } = await params;
-  const exam = await prisma.exam.findUnique({
-    where: { id },
+  const exam = await prisma.exam.findFirst({
+    where: { id, classId: student.classId },
     include: {
       subject: { select: { id: true, name: true } },
     },
@@ -25,17 +31,23 @@ export async function GET(
 
   if (!exam) return Response.json({ error: "Exam not found" }, { status: 404 });
 
-  const student = await prisma.student.findUnique({
-    where: { userId: session.user.id },
-  });
   let myAttempt = null;
-  if (student) {
-    myAttempt = await prisma.examAttempt.findUnique({
-      where: {
-        examId_studentId: { examId: id, studentId: student.id },
-      },
-    });
-  }
+  myAttempt = await prisma.examAttempt.findUnique({
+    where: {
+      examId_studentId: { examId: id, studentId: student.id },
+    },
+  });
 
-  return Response.json({ exam, myAttempt });
+  const questions = await prisma.mcqQuestion.findMany({
+    where: { examQuestions: { some: { examId: id } } },
+    orderBy: { order: "asc" },
+    include: {
+      options: {
+        orderBy: { id: "asc" },
+        select: { id: true, title: true },
+      },
+    },
+  });
+
+  return Response.json({ exam, myAttempt, questions });
 }

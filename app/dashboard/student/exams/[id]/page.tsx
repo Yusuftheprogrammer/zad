@@ -1,5 +1,5 @@
 /**
- * Student Exam detail: show exam and form to submit attempt (answers as text for MVP).
+ * Student Exam detail: show exam and submit MCQ answers.
  */
 import { redirect } from "next/navigation";
 import Link from "next/link";
