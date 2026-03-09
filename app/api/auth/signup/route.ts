@@ -1,4 +1,5 @@
 import bcrypt from "bcrypt";
+import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 
 type SignupBody = {
@@ -38,7 +39,7 @@ export async function POST(request: Request) {
   const hashedPassword = await bcrypt.hash(password, 10);
 
   try {
-    const created = await prisma.$transaction(async (tx) => {
+    const created = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       const user = await tx.user.create({
         data: {
           name: name || undefined,
