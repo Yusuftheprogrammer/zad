@@ -4,7 +4,7 @@
  */
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { Role } from "@/generated/prisma/enums";
+import type { Role } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 
 /** Session user type (no password in session) */
