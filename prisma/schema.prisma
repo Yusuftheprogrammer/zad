@@ -1,0 +1,291 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  ADMIN
+  TEACHER
+  STUDENT
+  PARENT
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  password      String?
+  role          Role      @default(STUDENT)
+
+  admin   Admin?
+  teacher Teacher?
+  student Student?
+  parent  Parent?
+
+  accounts Account[]
+  sessions Session[]
+}
+
+model Admin {
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Teacher {
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  assignments TeachingAssignment[]
+  homeworks   Homework[]
+  exams       Exam[]
+}
+
+model Student {
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  parentId String?
+  parent   Parent? @relation(fields: [parentId], references: [id])
+
+  gradeId String
+  grade   Grade  @relation(fields: [gradeId], references: [id], onDelete: Cascade)
+
+  classId String
+  class   Class  @relation(fields: [classId], references: [id], onDelete: Cascade)
+
+  submissions  Submission[]
+  examAttempts ExamAttempt[]
+}
+
+model Parent {
+  id       String    @id @default(cuid())
+  userId   String    @unique
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  students Student[]
+}
+
+model Grade {
+  id   String @id @default(cuid())
+  name String
+
+  classes  Class[]
+  students Student[]
+}
+
+model Class {
+  id   String @id @default(cuid())
+  name String
+
+  gradeId String
+  grade   Grade  @relation(fields: [gradeId], references: [id], onDelete: Cascade)
+
+  students    Student[]
+  assignments TeachingAssignment[]
+  homeworks   Homework[]
+  lessons     Lesson[]
+  exams       Exam[]
+}
+
+model Subject {
+  id   String @id @default(cuid())
+  name String
+
+  assignments TeachingAssignment[]
+  lessons     Lesson[]
+  homeworks   Homework[]
+  exams       Exam[]
+}
+
+model TeachingAssignment {
+  id String @id @default(cuid())
+
+  teacherId String
+  teacher   Teacher @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+
+  subjectId String
+  subject   Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+
+  classId String
+  class   Class  @relation(fields: [classId], references: [id], onDelete: Cascade)
+
+  @@unique([teacherId, subjectId, classId])
+}
+
+model Lesson {
+  id         String @id @default(cuid())
+  title      String
+  content    String @db.Text
+  orderIndex Int    @default(0)
+
+  subjectId String
+  subject   Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+
+  classId String
+  class   Class  @relation(fields: [classId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Homework {
+  id          String   @id @default(cuid())
+  title       String
+  description String   @db.Text
+  dueDate     DateTime
+
+  subjectId String
+  subject   Subject @relation(fields: [subjectId], references: [id])
+
+  teacherId String
+  teacher   Teacher @relation(fields: [teacherId], references: [id])
+
+  classId String
+  class   Class  @relation(fields: [classId], references: [id], onDelete: Cascade)
+
+  submissions Submission[]
+  questions   HomeworkQuestion[]
+}
+
+model Submission {
+  id      String @id @default(cuid())
+  content String @db.Text
+  grade   Float?
+  status  String @default("SUBMITTED")
+
+  homeworkId String
+  homework   Homework @relation(fields: [homeworkId], references: [id], onDelete: Cascade)
+
+  studentId String
+  student   Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([homeworkId, studentId])
+}
+
+model Exam {
+  id              String   @id @default(cuid())
+  title           String
+  description     String?  @db.Text
+  durationMinutes Int      @default(60)
+  dueDate         DateTime
+
+  subjectId String
+  subject   Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+
+  teacherId String
+  teacher   Teacher @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+
+  classId String
+  class   Class  @relation(fields: [classId], references: [id], onDelete: Cascade)
+
+  attempts ExamAttempt[]
+  questions ExamQuestion[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ExamAttempt {
+  id String @id @default(cuid())
+
+  examId String
+  exam   Exam   @relation(fields: [examId], references: [id], onDelete: Cascade)
+
+  studentId String
+  student   Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  score   Float?
+  status  String  @default("SUBMITTED")
+  answers String? @db.Text
+
+  submittedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([examId, studentId])
+}
+
+model McqQuestion {
+  id String @id @default(cuid())
+
+  title           String
+  order           Int
+  numberOfOptions Int @default(4)
+
+  options Options[]
+
+  examQuestions     ExamQuestion[]
+  homeworkQuestions HomeworkQuestion[]
+}
+
+model ExamQuestion {
+  id String @id @default(cuid())
+
+  examId String
+  exam   Exam @relation(fields: [examId], references: [id], onDelete: Cascade)
+
+  questionId String
+  question   McqQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  order Int
+
+  @@unique([examId, questionId])
+}
+
+model HomeworkQuestion {
+  id String @id @default(cuid())
+
+  homeworkId String
+  homework   Homework @relation(fields: [homeworkId], references: [id], onDelete: Cascade)
+
+  questionId String
+  question   McqQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  order Int
+
+  @@unique([homeworkId, questionId])
+}
+
+model Options {
+  id         String       @id @default(cuid())
+  title      String
+  isCorrect  Boolean      @default(false)
+  questionId String
+  question   McqQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+}
+
+/**
+ * NextAuth
+ */
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
