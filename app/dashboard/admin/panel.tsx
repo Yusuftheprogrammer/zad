@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { requestJson } from "./api";
-import { Notice, Grade, Parent, SchoolClass, Student, Subject, Teacher } from "./types";
+import { AdminDataResponse, Notice, Grade, Parent, SchoolClass, Student, Subject, Teacher } from "./types";
 import { NoticeBanner } from "./components/notice-banner";
 import { StatusMessage } from "@/components/ui/status-message";
 import { GradesSection } from "./components/grades-section";
@@ -27,20 +27,13 @@ export function AdminPanel() {
     setLoading(true);
     if (clearNotice) setNotice(null);
     try {
-      const [g, c, s, p, st, t] = await Promise.all([
-        requestJson<Grade[]>("/api/dashboard/admin/grade"),
-        requestJson<SchoolClass[]>("/api/dashboard/admin/class"),
-        requestJson<Subject[]>("/api/dashboard/admin/subject"),
-        requestJson<Parent[]>("/api/dashboard/admin/parent"),
-        requestJson<Student[]>("/api/dashboard/admin/student"),
-        requestJson<Teacher[]>("/api/dashboard/admin/teacher"),
-      ]);
-      setGrades(g);
-      setClasses(c);
-      setSubjects(s);
-      setParents(p);
-      setStudents(st);
-      setTeachers(t);
+      const data = await requestJson<AdminDataResponse>("/api/dashboard/admin/data");
+      setGrades(data.grades);
+      setClasses(data.classes);
+      setSubjects(data.subjects);
+      setParents(data.parents);
+      setStudents(data.students);
+      setTeachers(data.teachers);
     } catch (error) {
       setNotice({ type: "error", message: error instanceof Error ? error.message : "Failed to load data" });
     } finally {

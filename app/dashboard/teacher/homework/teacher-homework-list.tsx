@@ -38,13 +38,11 @@ export function TeacherHomeworkList() {
 
   function load() {
     setError(null);
-    Promise.all([
-      fetch("/api/dashboard/teacher/homework").then((r) => (r.ok ? r.json() : [])),
-      fetch("/api/dashboard/teacher/subjects").then((r) => (r.ok ? r.json() : [])),
-    ])
-      .then(([hw, sub]) => {
-        setHomework(hw);
-        setSubjects(sub);
+    fetch("/api/dashboard/teacher/homework-data")
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error("Failed to load homework data"))))
+      .then((data: { homework: Homework[]; subjects: TeacherSubjectAssignment[] }) => {
+        setHomework(data.homework);
+        setSubjects(data.subjects);
       })
       .catch(() => setError("Failed to load homework data"))
       .finally(() => setLoading(false));

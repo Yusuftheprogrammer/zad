@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { requireAuth } from "@/lib/auth";
 import { AdminPanel } from "./panel";
 import { SchoolPieChart } from "@/components/SchoolPieChart";
-import { prisma } from "@/lib/prisma";
+import { getAdminStats } from "@/lib/data-cache";
 
 export default async function AdminDashboardPage() {
   const session = await requireAuth();
@@ -21,19 +21,7 @@ export default async function AdminDashboardPage() {
     homeworksCount,
     examsCount,
     submissionsCount,
-  ] = await Promise.all([
-    prisma.user.groupBy({ by: ["role"], _count: { _all: true } }),
-    prisma.grade.count(),
-    prisma.class.count(),
-    prisma.subject.count(),
-    prisma.teacher.count(),
-    prisma.student.count(),
-    prisma.parent.count(),
-    prisma.lesson.count(),
-    prisma.homework.count(),
-    prisma.exam.count(),
-    prisma.submission.count(),
-  ]);
+  ] = await getAdminStats();
 
   const usersData = usersByRole.map((entry) => ({
     label: entry.role,

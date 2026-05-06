@@ -1,29 +1,25 @@
-/**
- * NextAuth handler: Credentials (email + password), JWT session with user id and role.
- * Used by getServerSession(authOptions) and protect dashboard APIs via lib/auth.
- */
-import NextAuth, { NextAuthOptions } from "next-auth";
+import NextAuth, { NextAuthOptions, DefaultSession } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcrypt";
 import { prisma } from "@/lib/prisma";
 
 type Role = "ADMIN" | "TEACHER" | "STUDENT" | "PARENT";
 
+// تصحيح تعريفات الأنواع
 declare module "next-auth" {
   interface Session {
     user: {
       id: string;
       role: Role;
-      name?: string | null;
-      email?: string | null;
-    };
+    } & DefaultSession["user"]
   }
 
   interface User {
-    id: string;
     role: Role;
   }
+}
 
+declare module "next-auth/jwt" {
   interface JWT {
     id: string;
     role: Role;
@@ -39,20 +35,22 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Password", type: "password" },
       },
       authorize: async (credentials) => {
-        if (!credentials?.email || !credentials.password) return null;
+        console.log("Checking credentials for:", credentials?.email);
+        
+        if (!credentials?.email || !credentials.password) {
+          console.log("User not found in DB");
+          return null;
+        };
 
         const user = await prisma.user.findUnique({
           where: { email: credentials.email },
-          include: {
-            student: true,
-            teacher: true,
-            admin: true,
-          },
         });
 
-        if (!user) return null;
+        // التحقق من وجود المستخدم وكلمة السر (تجنب الـ crash)
+        if (!user || !user.password) return null;
 
-        const isValid = await bcrypt.compare(credentials.password, user.password!);
+        const isValid = await bcrypt.compare(credentials.password, user.password);
+        console.log("Password Valid:", isValid);
         if (!isValid) return null;
 
         return {
@@ -74,16 +72,18 @@ export const authOptions: NextAuthOptions = {
       return token;
     },
     async session({ session, token }) {
-      if (session.user && token) {
-        session.user.id = token.id as string;
-        session.user.role = token.role as Role;
+      if (session.user) {
+        session.user.id = token.id;
+        session.user.role = token.role;
       }
       return session;
     },
   },
-  secret: process.env.JWT_SECRET,
+  secret: process.env.NEXTAUTH_SECRET, 
+  pages: {
+    signIn: '/login',
+  }
 };
 
-const handler =  NextAuth(authOptions);
-
+const handler = NextAuth(authOptions);
 export { handler as GET, handler as POST };

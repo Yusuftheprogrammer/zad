@@ -34,13 +34,11 @@ export function TeacherLessonList() {
 
   function load() {
     setError(null);
-    Promise.all([
-      fetch("/api/dashboard/teacher/lessons").then((r) => (r.ok ? r.json() : [])),
-      fetch("/api/dashboard/teacher/subjects").then((r) => (r.ok ? r.json() : [])),
-    ])
-      .then(([less, sub]) => {
-        setLessons(less);
-        setSubjects(sub);
+    fetch("/api/dashboard/teacher/lessons-data")
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error("Failed to load lessons data"))))
+      .then((data: { lessons: Lesson[]; subjects: TeacherSubjectAssignment[] }) => {
+        setLessons(data.lessons);
+        setSubjects(data.subjects);
       })
       .catch(() => setError("Failed to load lessons data"))
       .finally(() => setLoading(false));

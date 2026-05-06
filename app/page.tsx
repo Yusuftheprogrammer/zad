@@ -1,15 +1,7 @@
-import bcrypt from "bcrypt";
-import {prisma} from "@/lib/prisma";
-
 /**
  * Home page: links to login and dashboard.
  */
-
-
-
 export default async function Home() {
-
-
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-6 bg-background p-8">
       <h1 className="text-2xl font-semibold">Zad</h1>

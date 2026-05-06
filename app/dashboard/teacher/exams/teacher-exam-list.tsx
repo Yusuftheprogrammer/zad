@@ -36,13 +36,11 @@ export function TeacherExamList() {
 
   function load() {
     setError(null);
-    Promise.all([
-      fetch("/api/dashboard/teacher/exams").then((r) => (r.ok ? r.json() : [])),
-      fetch("/api/dashboard/teacher/subjects").then((r) => (r.ok ? r.json() : [])),
-    ])
-      .then(([ex, sub]) => {
-        setExams(ex);
-        setSubjects(sub);
+    fetch("/api/dashboard/teacher/exams-data")
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error("Failed to load exams data"))))
+      .then((data: { exams: Exam[]; subjects: TeacherSubjectAssignment[] }) => {
+        setExams(data.exams);
+        setSubjects(data.subjects);
       })
       .catch(() => setError("Failed to load exams data"))
       .finally(() => setLoading(false));
