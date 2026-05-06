@@ -19,7 +19,7 @@ export default async function StudentLessonPage({
   return (
     <div>
       <Link href="/dashboard/student/lessons" className="text-sm text-muted-foreground hover:underline">
-        Back to lessons
+        رجوع
       </Link>
       <LessonDetail lessonId={id} />
     </div>

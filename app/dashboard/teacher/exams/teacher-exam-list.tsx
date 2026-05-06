@@ -37,12 +37,12 @@ export function TeacherExamList() {
   function load() {
     setError(null);
     fetch("/api/dashboard/teacher/exams-data")
-      .then((r) => (r.ok ? r.json() : Promise.reject(new Error("Failed to load exams data"))))
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error("فشل تحميل بيانات الاختبارات"))))
       .then((data: { exams: Exam[]; subjects: TeacherSubjectAssignment[] }) => {
         setExams(data.exams);
         setSubjects(data.subjects);
       })
-      .catch(() => setError("Failed to load exams data"))
+      .catch(() => setError("فشل تحميل بيانات الاختبارات"))
       .finally(() => setLoading(false));
   }
 
@@ -64,7 +64,7 @@ export function TeacherExamList() {
 
     if (!assignment) {
       setCreating(false);
-      setToast({ type: "error", message: "Please select subject and class" });
+      setToast({ type: "error", message: "يرجى اختيار المادة والفصل" });
       return;
     }
 
@@ -83,47 +83,47 @@ export function TeacherExamList() {
     setCreating(false);
     if (res.ok) {
       form.reset();
-      setToast({ type: "success", message: "Exam created successfully" });
+      setToast({ type: "success", message: "تم إنشاء الاختبار بنجاح" });
       load();
     } else {
-      setToast({ type: "error", message: "Failed to create exam" });
+      setToast({ type: "error", message: "فشل إنشاء الاختبار" });
     }
   }
 
   async function handleDelete(id: string) {
-    if (!confirm("Delete this exam?")) return;
+    if (!confirm("هل تريد حذف هذا الاختبار؟")) return;
     setDeletingId(id);
     const res = await fetch(`/api/dashboard/teacher/exams/${id}`, { method: "DELETE" });
     setDeletingId(null);
     if (res.ok) {
-      setToast({ type: "success", message: "Exam deleted successfully" });
+      setToast({ type: "success", message: "تم حذف الاختبار بنجاح" });
       load();
     } else {
-      setToast({ type: "error", message: "Failed to delete exam" });
+      setToast({ type: "error", message: "فشل حذف الاختبار" });
     }
   }
 
-  if (loading) return <StatusMessage variant="loading" message="Loading exams..." />;
+  if (loading) return <StatusMessage variant="loading" message="جاري تحميل الاختبارات..." />;
   if (error) return <StatusMessage variant="error" message={error} />;
 
   return (
     <div className="space-y-6">
       {toast && <ToastMessage type={toast.type} message={toast.message} onClose={() => setToast(null)} />}
       <div className="rounded-lg border bg-card p-4">
-        <h2 className="mb-3 font-medium">Create exam</h2>
+        <h2 className="mb-3 font-medium">إنشاء اختبار</h2>
         {subjects.length === 0 ? (
-          <p className="text-sm text-muted-foreground">No assigned subjects found for this teacher.</p>
+          <p className="text-sm text-muted-foreground">لا توجد مواد مسندة لهذا المعلم.</p>
         ) : (
           <form onSubmit={handleCreate} className="flex flex-col gap-3">
             <input
               name="title"
-              placeholder="Title"
+              placeholder="العنوان"
               required
               className="rounded border border-input bg-background px-3 py-2 text-sm"
             />
             <textarea
               name="description"
-              placeholder="Description"
+              placeholder="الوصف"
               rows={2}
               className="rounded border border-input bg-background px-3 py-2 text-sm"
             />
@@ -133,7 +133,7 @@ export function TeacherExamList() {
                 required
                 className="rounded border border-input bg-background px-3 py-2 text-sm"
               >
-                <option value="">Subject and class</option>
+                <option value="">المادة والفصل</option>
                 {subjects.map((s) => (
                   <option key={s.assignmentId} value={s.assignmentId}>
                     {s.label}
@@ -147,7 +147,7 @@ export function TeacherExamList() {
                 min={1}
                 className="w-24 rounded border border-input bg-background px-3 py-2 text-sm"
               />
-              <span className="flex items-center text-sm text-muted-foreground">min</span>
+              <span className="flex items-center text-sm text-muted-foreground">دقيقة</span>
               <input
                 name="dueDate"
                 type="date"
@@ -160,7 +160,7 @@ export function TeacherExamList() {
               className="inline-flex w-fit items-center gap-2 rounded bg-primary px-4 py-2 text-sm text-primary-foreground disabled:opacity-50"
             >
               {creating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
-              {creating ? "Creating..." : "Create"}
+              {creating ? "جاري الإنشاء..." : "إنشاء"}
             </button>
           </form>
         )}
@@ -172,7 +172,7 @@ export function TeacherExamList() {
             <div>
               <h3 className="font-medium">{e.title}</h3>
               <p className="text-sm text-muted-foreground">
-                {e.subject.name} - {e.class.name} - {e.durationMinutes} min - Due {new Date(e.dueDate).toLocaleDateString()} - {e._count.attempts} attempts
+                {e.subject.name} - {e.class.name} - {e.durationMinutes} دقيقة - آخر موعد {new Date(e.dueDate).toLocaleDateString()} - {e._count.attempts} محاولة
               </p>
             </div>
             <button
@@ -182,12 +182,12 @@ export function TeacherExamList() {
               className="inline-flex items-center gap-1 text-sm text-destructive hover:underline"
             >
               <Trash2 className="h-4 w-4" />
-              {deletingId === e.id ? "Deleting..." : "Delete"}
+              {deletingId === e.id ? "جاري الحذف..." : "حذف"}
             </button>
           </li>
         ))}
       </ul>
-      {exams.length === 0 && <StatusMessage variant="empty" message="No exams yet." />}
+      {exams.length === 0 && <StatusMessage variant="empty" message="لا توجد اختبارات حتى الآن." />}
     </div>
   );
 }

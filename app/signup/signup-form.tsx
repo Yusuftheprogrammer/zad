@@ -31,7 +31,7 @@ export function SignupForm() {
     setLoading(false);
 
     if (!res.ok) {
-      setError(data.error ?? "Sign up failed");
+      setError(data.error ?? "فشل إنشاء الحساب");
       return;
     }
     router.push("/login");
@@ -40,22 +40,22 @@ export function SignupForm() {
 
   return (
     <form onSubmit={onSubmit} className="flex flex-col gap-3">
-      <label className="text-sm font-medium">Name (optional)</label>
+      <label className="text-sm font-medium">الاسم (اختياري)</label>
       <input
         name="name"
         type="text"
         className="rounded border border-input bg-background px-3 py-2 text-sm"
-        placeholder="Your name"
+        placeholder="اسمك"
       />
-      <label className="text-sm font-medium">Email</label>
+      <label className="text-sm font-medium">البريد الإلكتروني</label>
       <input
         name="email"
         type="email"
         required
         className="rounded border border-input bg-background px-3 py-2 text-sm"
-        placeholder="you@example.com"
+        placeholder="example@email.com"
       />
-      <label className="text-sm font-medium">Password</label>
+      <label className="text-sm font-medium">كلمة المرور</label>
       <input
         name="password"
         type="password"
@@ -63,13 +63,13 @@ export function SignupForm() {
         minLength={6}
         className="rounded border border-input bg-background px-3 py-2 text-sm"
       />
-      <label className="text-sm font-medium">I am a</label>
+      <label className="text-sm font-medium">أنا</label>
       <select
         name="role"
         className="rounded border border-input bg-background px-3 py-2 text-sm"
       >
-        <option value="STUDENT">Student</option>
-        <option value="TEACHER">Teacher</option>
+        <option value="STUDENT">طالب</option>
+        <option value="TEACHER">معلم</option>
       </select>
       {error && <p className="text-sm text-destructive">{error}</p>}
       <button
@@ -77,7 +77,7 @@ export function SignupForm() {
         disabled={loading}
         className="mt-2 rounded bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90 disabled:opacity-50"
       >
-        {loading ? "Creating…" : "Sign up"}
+        {loading ? "جاري الإنشاء..." : "إنشاء حساب"}
       </button>
     </form>
   );

@@ -11,11 +11,11 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
-    { label: "Dashboard", href: "/", icon: "⊞" },
-    { label: "Students", href: "/students", icon: "◎" },
-    { label: "Homeworks", href: "/homeworks", icon: "◈" },
-    { label: "Exams", href: "/exams", icon: "◉" },
-    { label: "Settings", href: "/settings", icon: "◐" },
+    { label: "لوحة التحكم", href: "/", icon: "⊞" },
+    { label: "الطلاب", href: "/students", icon: "◎" },
+    { label: "الواجبات", href: "/homeworks", icon: "◈" },
+    { label: "الاختبارات", href: "/exams", icon: "◉" },
+    { label: "الإعدادات", href: "/settings", icon: "◐" },
 ];
 
 export default function Sidebar() {
@@ -86,7 +86,7 @@ export default function Sidebar() {
           text-gray-400 hover:text-white hover:bg-gray-800
           rounded-lg transition-colors duration-150
         "
-                aria-label="Toggle sidebar"
+                aria-label="طي أو توسيع الشريط الجانبي"
             >
         <span className={`text-lg transition-transform duration-300 ${collapsed ? "rotate-180" : ""}`}>
           ◀

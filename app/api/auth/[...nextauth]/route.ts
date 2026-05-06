@@ -29,10 +29,10 @@ declare module "next-auth/jwt" {
 export const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
-      name: "Credentials",
+      name: "بيانات الدخول",
       credentials: {
-        email: { label: "Email", type: "email" },
-        password: { label: "Password", type: "password" },
+        email: { label: "البريد الإلكتروني", type: "email" },
+        password: { label: "كلمة المرور", type: "password" },
       },
       authorize: async (credentials) => {
         console.log("Checking credentials for:", credentials?.email);

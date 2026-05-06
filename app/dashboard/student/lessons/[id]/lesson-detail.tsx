@@ -15,14 +15,14 @@ export function LessonDetail({ lessonId }: { lessonId: string }) {
 
   useEffect(() => {
     fetch(`/api/dashboard/student/lessons/${lessonId}`)
-      .then((res) => (res.ok ? res.json() : Promise.reject(new Error("Failed"))))
+      .then((res) => (res.ok ? res.json() : Promise.reject(new Error("فشل التحميل"))))
       .then(setLesson)
       .catch(() => setLesson(null))
       .finally(() => setLoading(false));
   }, [lessonId]);
 
-  if (loading) return <p className="text-muted-foreground">Loading…</p>;
-  if (!lesson) return <p className="text-destructive">Lesson not found.</p>;
+  if (loading) return <p className="text-muted-foreground">جاري التحميل...</p>;
+  if (!lesson) return <p className="text-destructive">لم يتم العثور على الدرس.</p>;
 
   return (
     <article className="mt-4 max-w-2xl">

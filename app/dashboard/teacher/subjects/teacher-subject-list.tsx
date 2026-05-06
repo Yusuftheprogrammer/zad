@@ -37,16 +37,16 @@ export function TeacherSubjectList() {
     }
   }
 
-  if (loading) return <p className="text-muted-foreground">Loading…</p>;
+  if (loading) return <p className="text-muted-foreground">جاري التحميل...</p>;
 
   return (
     <div className="space-y-6">
       <div className="rounded-lg border bg-card p-4">
-        <h2 className="mb-3 font-medium">Create subject</h2>
+        <h2 className="mb-3 font-medium">إنشاء مادة</h2>
         <form onSubmit={handleCreate} className="flex gap-2">
           <input
             name="name"
-            placeholder="Subject name (e.g. Math, Physics)"
+            placeholder="اسم المادة (مثل: رياضيات، فيزياء)"
             required
             className="flex-1 rounded border border-input bg-background px-3 py-2 text-sm"
           />
@@ -55,7 +55,7 @@ export function TeacherSubjectList() {
             disabled={creating}
             className="rounded bg-primary px-4 py-2 text-sm text-primary-foreground disabled:opacity-50"
           >
-            {creating ? "Creating…" : "Create"}
+            {creating ? "جاري الإنشاء..." : "إنشاء"}
           </button>
         </form>
       </div>
@@ -67,7 +67,7 @@ export function TeacherSubjectList() {
           </li>
         ))}
       </ul>
-      {subjects.length === 0 && <p className="text-muted-foreground">No subjects yet. Create one above.</p>}
+      {subjects.length === 0 && <p className="text-muted-foreground">لا توجد مواد حتى الآن. أنشئ مادة بالأعلى.</p>}
     </div>
   );
 }

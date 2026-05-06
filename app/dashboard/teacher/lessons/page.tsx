@@ -12,8 +12,8 @@ export default async function TeacherLessonsPage() {
 
   return (
     <div>
-      <h1 className="mb-4 text-xl font-semibold">Lessons</h1>
-      <p className="mb-4 text-sm text-muted-foreground">Create and manage lessons by subject.</p>
+      <h1 className="mb-4 text-xl font-semibold">الدروس</h1>
+      <p className="mb-4 text-sm text-muted-foreground">إنشاء الدروس وإدارتها حسب المادة.</p>
       <TeacherLessonList />
     </div>
   );

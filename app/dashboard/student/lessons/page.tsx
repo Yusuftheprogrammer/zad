@@ -12,8 +12,8 @@ export default async function StudentLessonsPage() {
 
   return (
     <div>
-      <h1 className="mb-4 text-xl font-semibold">Lessons</h1>
-      <p className="mb-4 text-sm text-muted-foreground">Browse lessons by subject.</p>
+      <h1 className="mb-4 text-xl font-semibold">الدروس</h1>
+      <p className="mb-4 text-sm text-muted-foreground">تصفح الدروس حسب المادة.</p>
       <LessonList />
     </div>
   );

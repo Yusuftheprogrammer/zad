@@ -13,8 +13,8 @@ export default async function StudentHomeworkPage() {
 
   return (
     <div>
-      <h1 className="mb-4 text-xl font-semibold">Homework</h1>
-      <p className="mb-4 text-sm text-muted-foreground">View assignments and submit your work.</p>
+      <h1 className="mb-4 text-xl font-semibold">الواجبات</h1>
+      <p className="mb-4 text-sm text-muted-foreground">استعرض الواجبات وسلّم أعمالك.</p>
       <HomeworkList />
     </div>
   );

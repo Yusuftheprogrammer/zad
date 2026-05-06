@@ -53,9 +53,9 @@ export async function requireRole(
 ): Promise<Response | null> {
   const session = await requireAuth();
   if (!session)
-    return Response.json({ error: "Unauthorized" }, { status: 401 });
+    return Response.json({ error: "غير مصرح بالدخول" }, { status: 401 });
   if (session.user.role !== role)
-    return Response.json({ error: "Forbidden" }, { status: 403 });
+    return Response.json({ error: "ليس لديك صلاحية الوصول" }, { status: 403 });
   return null;
 }
 
@@ -81,5 +81,5 @@ export async function quickAuth(role: Role) {
   const forbidden = await requireRole(role);
   if (forbidden) return forbidden;
   const session = await requireAuth();
-  if (!session) return Response.json({ error: "Unauthorized" }, { status: 401 });
+  if (!session) return Response.json({ error: "غير مصرح بالدخول" }, { status: 401 });
 }

@@ -12,9 +12,9 @@ export default async function TeacherSubjectsPage() {
 
   return (
     <div>
-      <h1 className="mb-4 text-xl font-semibold">Subjects</h1>
+      <h1 className="mb-4 text-xl font-semibold">المواد</h1>
       <p className="mb-4 text-sm text-muted-foreground">
-        Create subjects first, then add homework, exams, and lessons to them.
+        أنشئ المواد أولًا، ثم أضف إليها الواجبات والاختبارات والدروس.
       </p>
       <TeacherSubjectList />
     </div>

@@ -12,8 +12,8 @@ export default async function StudentExamsPage() {
 
   return (
     <div>
-      <h1 className="mb-4 text-xl font-semibold">Exams</h1>
-      <p className="mb-4 text-sm text-muted-foreground">View and submit exams.</p>
+      <h1 className="mb-4 text-xl font-semibold">الاختبارات</h1>
+      <p className="mb-4 text-sm text-muted-foreground">استعرض الاختبارات وقدم إجاباتك.</p>
       <ExamList />
     </div>
   );

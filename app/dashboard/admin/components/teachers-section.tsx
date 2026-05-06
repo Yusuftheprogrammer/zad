@@ -18,7 +18,7 @@ type Props = {
 
 export function TeachersSection({ teachers, classes, subjects, saving, gradeName, onCreate, onDelete }: Props) {
   return (
-    <AdminSection title="Teachers">
+    <AdminSection title="المعلمون">
       <form
         className="mb-3 grid gap-2 md:grid-cols-3"
         onSubmit={(e: FormEvent<HTMLFormElement>) => {
@@ -33,11 +33,11 @@ export function TeachersSection({ teachers, classes, subjects, saving, gradeName
           onCreate({ name: name || undefined, email, password, classId, subjectId }, () => form.reset());
         }}
       >
-        <input name="name" placeholder="Name" className="rounded border px-3 py-2 text-sm" />
-        <input name="email" type="email" placeholder="Email" className="rounded border px-3 py-2 text-sm" />
-        <input name="password" type="password" placeholder="Password" className="rounded border px-3 py-2 text-sm" />
+        <input name="name" placeholder="الاسم" className="rounded border px-3 py-2 text-sm" />
+        <input name="email" type="email" placeholder="البريد الإلكتروني" className="rounded border px-3 py-2 text-sm" />
+        <input name="password" type="password" placeholder="كلمة المرور" className="rounded border px-3 py-2 text-sm" />
         <select name="classId" className="rounded border px-3 py-2 text-sm">
-          <option value="">Select class</option>
+          <option value="">اختر الفصل</option>
           {classes.map((c) => (
             <option key={c.id} value={c.id}>
               {c.name} ({gradeName(c.gradeId)})
@@ -45,7 +45,7 @@ export function TeachersSection({ teachers, classes, subjects, saving, gradeName
           ))}
         </select>
         <select name="subjectId" className="rounded border px-3 py-2 text-sm">
-          <option value="">Select subject</option>
+          <option value="">اختر المادة</option>
           {subjects.map((subject) => (
             <option key={subject.id} value={subject.id}>
               {subject.name}
@@ -54,7 +54,7 @@ export function TeachersSection({ teachers, classes, subjects, saving, gradeName
         </select>
         <button disabled={saving} className="inline-flex items-center gap-1 rounded bg-primary px-3 py-2 text-sm text-primary-foreground">
           <Plus className="h-4 w-4" />
-          Add Teacher
+          إضافة معلم
         </button>
       </form>
       <ul className="space-y-2">
@@ -62,17 +62,17 @@ export function TeachersSection({ teachers, classes, subjects, saving, gradeName
           <li key={teacher.id} className="rounded border px-3 py-2 text-sm">
             <div className="mb-1 flex items-center justify-between">
               <span>
-                {teacher.user.name ?? "Unnamed"} ({teacher.user.email})
+                {teacher.user.name ?? "بدون اسم"} ({teacher.user.email})
               </span>
               <button disabled={saving} className="inline-flex items-center gap-1 text-destructive" onClick={() => onDelete(teacher.id)}>
                 <Trash2 className="h-4 w-4" />
-                Delete
+                حذف
               </button>
             </div>
             <div className="text-xs text-muted-foreground">
               {teacher.assignments.length > 0
                 ? teacher.assignments.map((a) => `${a.subject.name} - ${a.class.name}`).join(", ")
-                : "No teaching assignments"}
+                : "لا توجد إسنادات تدريس"}
             </div>
           </li>
         ))}

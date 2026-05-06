@@ -35,7 +35,7 @@ export function AdminPanel() {
       setStudents(data.students);
       setTeachers(data.teachers);
     } catch (error) {
-      setNotice({ type: "error", message: error instanceof Error ? error.message : "Failed to load data" });
+      setNotice({ type: "error", message: error instanceof Error ? error.message : "فشل تحميل البيانات" });
     } finally {
       setLoading(false);
     }
@@ -53,14 +53,14 @@ export function AdminPanel() {
       setNotice({ type: "success", message: successMessage });
       await loadAll(false);
     } catch (error) {
-      setNotice({ type: "error", message: error instanceof Error ? error.message : "Operation failed" });
+      setNotice({ type: "error", message: error instanceof Error ? error.message : "فشلت العملية" });
     } finally {
       setSaving(false);
     }
   }
 
   function gradeName(gradeId: string) {
-    return grades.find((g) => g.id === gradeId)?.name ?? "Unknown grade";
+    return grades.find((g) => g.id === gradeId)?.name ?? "مرحلة غير معروفة";
   }
 
   return (
@@ -68,7 +68,7 @@ export function AdminPanel() {
       <NoticeBanner notice={notice} onClose={() => setNotice(null)} />
 
       {loading ? (
-        <StatusMessage variant="loading" message="Loading admin data..." />
+        <StatusMessage variant="loading" message="جاري تحميل بيانات الإدارة..." />
       ) : (
         <>
           <GradesSection
@@ -84,13 +84,13 @@ export function AdminPanel() {
                   });
                   reset();
                 },
-                "Grade created"
+                "تمت إضافة المرحلة"
               )
             }
             onDelete={(id) =>
               void withSave(
                 () => requestJson(`/api/dashboard/admin/grade/${id}`, { method: "DELETE" }).then(() => {}),
-                "Grade deleted"
+                "تم حذف المرحلة"
               )
             }
           />
@@ -110,13 +110,13 @@ export function AdminPanel() {
                   });
                   reset();
                 },
-                "Class created"
+                "تمت إضافة الفصل"
               )
             }
             onDelete={(id) =>
               void withSave(
                 () => requestJson(`/api/dashboard/admin/class/${id}`, { method: "DELETE" }).then(() => {}),
-                "Class deleted"
+                "تم حذف الفصل"
               )
             }
           />
@@ -134,13 +134,13 @@ export function AdminPanel() {
                   });
                   reset();
                 },
-                "Subject created"
+                "تمت إضافة المادة"
               )
             }
             onDelete={(id) =>
               void withSave(
                 () => requestJson(`/api/dashboard/admin/subject/${id}`, { method: "DELETE" }).then(() => {}),
-                "Subject deleted"
+                "تم حذف المادة"
               )
             }
           />
@@ -158,13 +158,13 @@ export function AdminPanel() {
                   });
                   reset();
                 },
-                "Parent created"
+                "تمت إضافة ولي الأمر"
               )
             }
             onDelete={(id) =>
               void withSave(
                 () => requestJson(`/api/dashboard/admin/parent/${id}`, { method: "DELETE" }).then(() => {}),
-                "Parent deleted"
+                "تم حذف ولي الأمر"
               )
             }
           />
@@ -185,13 +185,13 @@ export function AdminPanel() {
                   });
                   reset();
                 },
-                "Student created"
+                "تمت إضافة الطالب"
               )
             }
             onDelete={(id) =>
               void withSave(
                 () => requestJson(`/api/dashboard/admin/student/${id}`, { method: "DELETE" }).then(() => {}),
-                "Student deleted"
+                "تم حذف الطالب"
               )
             }
           />
@@ -212,13 +212,13 @@ export function AdminPanel() {
                   });
                   reset();
                 },
-                "Teacher created"
+                "تمت إضافة المعلم"
               )
             }
             onDelete={(id) =>
               void withSave(
                 () => requestJson(`/api/dashboard/admin/teacher/${id}`, { method: "DELETE" }).then(() => {}),
-                "Teacher deleted"
+                "تم حذف المعلم"
               )
             }
           />

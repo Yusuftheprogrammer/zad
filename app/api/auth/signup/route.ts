@@ -17,23 +17,23 @@ export async function POST(request: Request) {
   try {
     body = await request.json();
   } catch {
-    return Response.json({ error: "Invalid JSON" }, { status: 400 });
+    return Response.json({ error: "صيغة JSON غير صحيحة" }, { status: 400 });
   }
 
   const { name, email, password, role, gradeId, classId, parentId } = body;
   if (!email || !password) {
-    return Response.json({ error: "email and password are required" }, { status: 400 });
+    return Response.json({ error: "البريد الإلكتروني وكلمة المرور مطلوبان" }, { status: 400 });
   }
 
   if ((role ?? "STUDENT") !== "STUDENT") {
     return Response.json(
-      { error: "Only student self-signup is allowed" },
+      { error: "التسجيل الذاتي متاح للطلاب فقط" },
       { status: 403 }
     );
   }
 
   if (!gradeId || !classId) {
-    return Response.json({ error: "gradeId and classId are required" }, { status: 400 });
+    return Response.json({ error: "المرحلة والفصل مطلوبان" }, { status: 400 });
   }
 
   const hashedPassword = await bcrypt.hash(password, 10);
@@ -65,7 +65,7 @@ export async function POST(request: Request) {
     return Response.json(created, { status: 201 });
   } catch (error) {
     const message =
-      error instanceof Error ? error.message : "Failed to create account";
+      error instanceof Error ? error.message : "فشل إنشاء الحساب";
     return Response.json({ error: message }, { status: 400 });
   }
 }

@@ -19,7 +19,7 @@ export default async function StudentDashboardPage() {
   if (!student) {
     return (
       <div className="rounded-lg border bg-card p-6 text-sm text-muted-foreground">
-        Student profile was not found.
+        لم يتم العثور على ملف الطالب.
       </div>
     );
   }
@@ -57,17 +57,17 @@ export default async function StudentDashboardPage() {
   const subjectNameById = new Map(lessonSubjects.map((subject) => [subject.id, subject.name]));
 
   const homeworkData = [
-    { label: "Submitted", value: submittedHomeworks },
-    { label: "Pending", value: Math.max(totalHomeworks - submittedHomeworks, 0) },
+    { label: "تم التسليم", value: submittedHomeworks },
+    { label: "متبقي", value: Math.max(totalHomeworks - submittedHomeworks, 0) },
   ];
 
   const examsData = [
-    { label: "Attempted", value: attemptedExams },
-    { label: "Pending", value: Math.max(totalExams - attemptedExams, 0) },
+    { label: "تمت المحاولة", value: attemptedExams },
+    { label: "متبقي", value: Math.max(totalExams - attemptedExams, 0) },
   ];
 
   const lessonsData = lessonsBySubject.map((entry) => ({
-    label: subjectNameById.get(entry.subjectId) ?? "Unknown subject",
+    label: subjectNameById.get(entry.subjectId) ?? "مادة غير معروفة",
     value: entry._count._all,
   }));
 
@@ -76,7 +76,7 @@ export default async function StudentDashboardPage() {
   return (
     <div className="space-y-6">
       <section className="rounded-lg border bg-card p-6">
-        <h1 className="text-2xl font-semibold">Student Dashboard</h1>
+        <h1 className="text-2xl font-semibold">لوحة تحكم الطالب</h1>
         <p className="mt-1 text-sm text-muted-foreground">
           {student.grade.name} - {student.class.name}
         </p>
@@ -84,36 +84,36 @@ export default async function StudentDashboardPage() {
 
       <section className="grid gap-4 sm:grid-cols-3">
         <div className="rounded-lg border bg-card p-4">
-          <p className="text-sm text-muted-foreground">Homeworks</p>
+          <p className="text-sm text-muted-foreground">الواجبات</p>
           <p className="mt-1 text-2xl font-semibold">{totalHomeworks}</p>
         </div>
         <div className="rounded-lg border bg-card p-4">
-          <p className="text-sm text-muted-foreground">Exams</p>
+          <p className="text-sm text-muted-foreground">الاختبارات</p>
           <p className="mt-1 text-2xl font-semibold">{totalExams}</p>
         </div>
         <div className="rounded-lg border bg-card p-4">
-          <p className="text-sm text-muted-foreground">Lessons</p>
+          <p className="text-sm text-muted-foreground">الدروس</p>
           <p className="mt-1 text-2xl font-semibold">{totalLessons}</p>
         </div>
       </section>
 
       <section className="grid gap-4 lg:grid-cols-3">
         <SchoolPieChart
-          cardTitle="Homework Status"
-          cardDescription="Your submissions in current class"
-          valueLabel="Homeworks"
+          cardTitle="حالة الواجبات"
+          cardDescription="تسليماتك في الفصل الحالي"
+          valueLabel="واجب"
           data={homeworkData}
         />
         <SchoolPieChart
-          cardTitle="Exam Status"
-          cardDescription="Your attempted exams in current class"
-          valueLabel="Exams"
+          cardTitle="حالة الاختبارات"
+          cardDescription="محاولاتك في الفصل الحالي"
+          valueLabel="اختبار"
           data={examsData}
         />
         <SchoolPieChart
-          cardTitle="Lessons by Subject"
-          cardDescription="Lesson distribution in your class"
-          valueLabel="Lessons"
+          cardTitle="الدروس حسب المادة"
+          cardDescription="توزيع الدروس في فصلك"
+          valueLabel="درس"
           data={lessonsData}
         />
       </section>

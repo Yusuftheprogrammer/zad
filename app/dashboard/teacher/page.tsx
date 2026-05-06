@@ -23,7 +23,7 @@ export default async function DashboardPage() {
   if (!teacher) {
     return (
       <div className="rounded-lg border bg-card p-6 text-sm text-muted-foreground">
-        Teacher profile was not found.
+        لم يتم العثور على ملف المعلم.
       </div>
     );
   }
@@ -59,17 +59,17 @@ export default async function DashboardPage() {
   );
 
   const studentsData = studentsByClass.map((entry) => ({
-    label: classNameById.get(entry.classId) ?? "Unknown class",
+    label: classNameById.get(entry.classId) ?? "فصل غير معروف",
     value: entry._count._all,
   }));
 
   const homeworksData = homeworksBySubject.map((entry) => ({
-    label: subjectNameById.get(entry.subjectId) ?? "Unknown subject",
+    label: subjectNameById.get(entry.subjectId) ?? "مادة غير معروفة",
     value: entry._count._all,
   }));
 
   const examsData = examsBySubject.map((entry) => ({
-    label: subjectNameById.get(entry.subjectId) ?? "Unknown subject",
+    label: subjectNameById.get(entry.subjectId) ?? "مادة غير معروفة",
     value: entry._count._all,
   }));
 
@@ -80,44 +80,44 @@ export default async function DashboardPage() {
   return (
     <div className="space-y-6">
       <section className="rounded-lg border bg-card p-6">
-        <h1 className="text-2xl font-semibold">Teacher Dashboard</h1>
+        <h1 className="text-2xl font-semibold">لوحة تحكم المعلم</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Welcome, {session.user.name ?? session.user.email}.
+          أهلاً بك، {session.user.name ?? session.user.email}.
         </p>
       </section>
 
       <section className="grid gap-4 sm:grid-cols-3">
         <div className="rounded-lg border bg-card p-4">
-          <p className="text-sm text-muted-foreground">Students</p>
+          <p className="text-sm text-muted-foreground">الطلاب</p>
           <p className="mt-1 text-2xl font-semibold">{totalStudents}</p>
         </div>
         <div className="rounded-lg border bg-card p-4">
-          <p className="text-sm text-muted-foreground">Homeworks</p>
+          <p className="text-sm text-muted-foreground">الواجبات</p>
           <p className="mt-1 text-2xl font-semibold">{totalHomeworks}</p>
         </div>
         <div className="rounded-lg border bg-card p-4">
-          <p className="text-sm text-muted-foreground">Exams</p>
+          <p className="text-sm text-muted-foreground">الاختبارات</p>
           <p className="mt-1 text-2xl font-semibold">{totalExams}</p>
         </div>
       </section>
 
       <section className="grid gap-4 lg:grid-cols-3">
         <SchoolPieChart
-          cardTitle="Students by Class"
-          cardDescription="Distribution in your assigned classes"
-          valueLabel="Students"
+          cardTitle="الطلاب حسب الفصل"
+          cardDescription="توزيع الطلاب في الفصول المسندة لك"
+          valueLabel="طالب"
           data={studentsData}
         />
         <SchoolPieChart
-          cardTitle="Homeworks by Subject"
-          cardDescription="Assignments you created"
-          valueLabel="Homeworks"
+          cardTitle="الواجبات حسب المادة"
+          cardDescription="الواجبات التي أنشأتها"
+          valueLabel="واجب"
           data={homeworksData}
         />
         <SchoolPieChart
-          cardTitle="Exams by Subject"
-          cardDescription="Exams you created"
-          valueLabel="Exams"
+          cardTitle="الاختبارات حسب المادة"
+          cardDescription="الاختبارات التي أنشأتها"
+          valueLabel="اختبار"
           data={examsData}
         />
       </section>

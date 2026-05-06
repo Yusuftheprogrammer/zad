@@ -35,12 +35,12 @@ export function TeacherLessonList() {
   function load() {
     setError(null);
     fetch("/api/dashboard/teacher/lessons-data")
-      .then((r) => (r.ok ? r.json() : Promise.reject(new Error("Failed to load lessons data"))))
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error("فشل تحميل بيانات الدروس"))))
       .then((data: { lessons: Lesson[]; subjects: TeacherSubjectAssignment[] }) => {
         setLessons(data.lessons);
         setSubjects(data.subjects);
       })
-      .catch(() => setError("Failed to load lessons data"))
+      .catch(() => setError("فشل تحميل بيانات الدروس"))
       .finally(() => setLoading(false));
   }
 
@@ -59,7 +59,7 @@ export function TeacherLessonList() {
 
     if (!assignment) {
       setCreating(false);
-      setToast({ type: "error", message: "Please select subject and class" });
+      setToast({ type: "error", message: "يرجى اختيار المادة والفصل" });
       return;
     }
 
@@ -76,47 +76,47 @@ export function TeacherLessonList() {
     setCreating(false);
     if (res.ok) {
       form.reset();
-      setToast({ type: "success", message: "Lesson created successfully" });
+      setToast({ type: "success", message: "تم إنشاء الدرس بنجاح" });
       load();
     } else {
-      setToast({ type: "error", message: "Failed to create lesson" });
+      setToast({ type: "error", message: "فشل إنشاء الدرس" });
     }
   }
 
   async function handleDelete(id: string) {
-    if (!confirm("Delete this lesson?")) return;
+    if (!confirm("هل تريد حذف هذا الدرس؟")) return;
     setDeletingId(id);
     const res = await fetch(`/api/dashboard/teacher/lessons/${id}`, { method: "DELETE" });
     setDeletingId(null);
     if (res.ok) {
-      setToast({ type: "success", message: "Lesson deleted successfully" });
+      setToast({ type: "success", message: "تم حذف الدرس بنجاح" });
       load();
     } else {
-      setToast({ type: "error", message: "Failed to delete lesson" });
+      setToast({ type: "error", message: "فشل حذف الدرس" });
     }
   }
 
-  if (loading) return <StatusMessage variant="loading" message="Loading lessons..." />;
+  if (loading) return <StatusMessage variant="loading" message="جاري تحميل الدروس..." />;
   if (error) return <StatusMessage variant="error" message={error} />;
 
   return (
     <div className="space-y-6">
       {toast && <ToastMessage type={toast.type} message={toast.message} onClose={() => setToast(null)} />}
       <div className="rounded-lg border bg-card p-4">
-        <h2 className="mb-3 font-medium">Create lesson</h2>
+        <h2 className="mb-3 font-medium">إنشاء درس</h2>
         {subjects.length === 0 ? (
-          <p className="text-sm text-muted-foreground">No assigned subjects found for this teacher.</p>
+          <p className="text-sm text-muted-foreground">لا توجد مواد مسندة لهذا المعلم.</p>
         ) : (
           <form onSubmit={handleCreate} className="flex flex-col gap-3">
             <input
               name="title"
-              placeholder="Title"
+              placeholder="العنوان"
               required
               className="rounded border border-input bg-background px-3 py-2 text-sm"
             />
             <textarea
               name="content"
-              placeholder="Content"
+              placeholder="المحتوى"
               rows={4}
               className="rounded border border-input bg-background px-3 py-2 text-sm"
             />
@@ -125,7 +125,7 @@ export function TeacherLessonList() {
               required
               className="rounded border border-input bg-background px-3 py-2 text-sm"
             >
-              <option value="">Subject and class</option>
+              <option value="">المادة والفصل</option>
               {subjects.map((s) => (
                 <option key={s.assignmentId} value={s.assignmentId}>
                   {s.label}
@@ -138,7 +138,7 @@ export function TeacherLessonList() {
               className="inline-flex w-fit items-center gap-2 rounded bg-primary px-4 py-2 text-sm text-primary-foreground disabled:opacity-50"
             >
               {creating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
-              {creating ? "Creating..." : "Create"}
+              {creating ? "جاري الإنشاء..." : "إنشاء"}
             </button>
           </form>
         )}
@@ -160,12 +160,12 @@ export function TeacherLessonList() {
               className="inline-flex items-center gap-1 text-sm text-destructive hover:underline"
             >
               <Trash2 className="h-4 w-4" />
-              {deletingId === l.id ? "Deleting..." : "Delete"}
+              {deletingId === l.id ? "جاري الحذف..." : "حذف"}
             </button>
           </li>
         ))}
       </ul>
-      {lessons.length === 0 && <StatusMessage variant="empty" message="No lessons yet." />}
+      {lessons.length === 0 && <StatusMessage variant="empty" message="لا توجد دروس حتى الآن." />}
     </div>
   );
 }

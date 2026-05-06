@@ -12,8 +12,8 @@ export default async function TeacherExamsPage() {
 
   return (
     <div>
-      <h1 className="mb-4 text-xl font-semibold">Exams</h1>
-      <p className="mb-4 text-sm text-muted-foreground">Create and manage exams.</p>
+      <h1 className="mb-4 text-xl font-semibold">الاختبارات</h1>
+      <p className="mb-4 text-sm text-muted-foreground">إنشاء الاختبارات وإدارتها.</p>
       <TeacherExamList />
     </div>
   );

@@ -13,10 +13,10 @@ export default async function SignupPage() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-muted/30">
       <div className="w-full max-w-sm rounded-lg border bg-card p-6 shadow-sm">
-        <h1 className="mb-4 text-xl font-semibold">Create account</h1>
+        <h1 className="mb-4 text-xl font-semibold">إنشاء حساب</h1>
         <SignupForm />
         <p className="mt-4 text-sm text-muted-foreground">
-          Already have an account? <a href="/login" className="text-primary underline">Sign in</a>
+          لديك حساب بالفعل؟ <a href="/login" className="text-primary underline">تسجيل الدخول</a>
         </p>
       </div>
     </div>

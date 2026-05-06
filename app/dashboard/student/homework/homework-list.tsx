@@ -26,9 +26,9 @@ export function HomeworkList() {
 
   useEffect(() => {
     fetch("/api/dashboard/student/homework")
-      .then((res) => (res.ok ? res.json() : Promise.reject(new Error("Failed to load"))))
+      .then((res) => (res.ok ? res.json() : Promise.reject(new Error("فشل التحميل"))))
       .then(setList)
-      .catch(() => setError("Failed to load homework"))
+      .catch(() => setError("فشل تحميل الواجبات"))
       .finally(() => setLoading(false));
   }, []);
 
@@ -46,18 +46,18 @@ export function HomeworkList() {
     if (res.ok) {
       form.reset();
       setError(null);
-      setToast({ type: "success", message: "Homework submitted successfully" });
+      setToast({ type: "success", message: "تم تسليم الواجب بنجاح" });
     } else {
       const data = await res.json().catch(() => ({}));
-      const message = data.error ?? "Submit failed";
+      const message = data.error ?? "فشل التسليم";
       setError(message);
       setToast({ type: "error", message });
     }
   }
 
-  if (loading) return <StatusMessage variant="loading" message="Loading homework..." />;
+  if (loading) return <StatusMessage variant="loading" message="جاري تحميل الواجبات..." />;
   if (error) return <StatusMessage variant="error" message={error} />;
-  if (list.length === 0) return <StatusMessage variant="empty" message="No homework assigned." />;
+  if (list.length === 0) return <StatusMessage variant="empty" message="لا توجد واجبات مسندة." />;
 
   return (
     <div className="space-y-4">
@@ -69,7 +69,7 @@ export function HomeworkList() {
             <div>
               <h2 className="font-medium">{h.title}</h2>
               <p className="text-sm text-muted-foreground">
-                {h.subject.name} - Due {new Date(h.dueDate).toLocaleDateString()}
+                {h.subject.name} - آخر موعد {new Date(h.dueDate).toLocaleDateString()}
               </p>
               {h.description && <p className="mt-2 text-sm">{h.description}</p>}
             </div>
@@ -77,7 +77,7 @@ export function HomeworkList() {
           <form onSubmit={(e) => handleSubmit(e, h.id)} className="mt-3">
             <textarea
               name="content"
-              placeholder="Your submission..."
+              placeholder="اكتب تسليمك هنا..."
               rows={2}
               className="w-full rounded border border-input bg-background px-3 py-2 text-sm"
             />
@@ -87,7 +87,7 @@ export function HomeworkList() {
               className="mt-2 inline-flex items-center gap-2 rounded bg-primary px-3 py-1 text-sm text-primary-foreground disabled:opacity-50"
             >
               {submitting === h.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-              {submitting === h.id ? "Submitting..." : "Submit"}
+              {submitting === h.id ? "جاري التسليم..." : "تسليم"}
             </button>
           </form>
         </li>

@@ -15,13 +15,13 @@ export async function requireTeacherContext(): Promise<{ teacherId: string } | R
   if (forbidden) return forbidden;
 
   const session = await requireAuth();
-  if (!session) return Response.json({ error: "Unauthorized" }, { status: 401 });
+  if (!session) return Response.json({ error: "غير مصرح بالدخول" }, { status: 401 });
 
   const teacher = await prisma.teacher.findUnique({
     where: { userId: session.user.id },
     select: { id: true },
   });
-  if (!teacher) return Response.json({ error: "Teacher profile not found" }, { status: 403 });
+  if (!teacher) return Response.json({ error: "لم يتم العثور على ملف المعلم" }, { status: 403 });
 
   return { teacherId: teacher.id };
 }

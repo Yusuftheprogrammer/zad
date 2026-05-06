@@ -31,7 +31,7 @@ export function LoginForm() {
 
     setLoading(false);
     if (res?.error) {
-      setError("Invalid email or password");
+      setError("البريد الإلكتروني أو كلمة المرور غير صحيحة");
       return;
     }
     router.push(callbackUrl);
@@ -40,15 +40,15 @@ export function LoginForm() {
 
   return (
     <form onSubmit={onSubmit} className="flex flex-col gap-3">
-      <label className="text-sm font-medium">Email</label>
+      <label className="text-sm font-medium">البريد الإلكتروني</label>
       <input
         name="email"
         type="email"
         required
         className="rounded border border-input bg-background px-3 py-2 text-sm"
-        placeholder="you@example.com"
+        placeholder="example@email.com"
       />
-      <label className="text-sm font-medium">Password</label>
+      <label className="text-sm font-medium">كلمة المرور</label>
       <input
         name="password"
         type="password"
@@ -62,7 +62,7 @@ export function LoginForm() {
         className="mt-2 inline-flex items-center justify-center gap-2 rounded bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90 disabled:opacity-50"
       >
         {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <LogIn className="h-4 w-4" />}
-        {loading ? "Signing in..." : "Sign in"}
+        {loading ? "جاري تسجيل الدخول..." : "تسجيل الدخول"}
       </button>
     </form>
   );

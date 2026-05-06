@@ -12,7 +12,7 @@ type Props = {
 
 export function GradesSection({ grades, saving, onCreate, onDelete }: Props) {
   return (
-    <AdminSection title="Grades">
+    <AdminSection title="المراحل">
       <form
         className="mb-3 flex gap-2"
         onSubmit={(e: FormEvent<HTMLFormElement>) => {
@@ -23,10 +23,10 @@ export function GradesSection({ grades, saving, onCreate, onDelete }: Props) {
           onCreate(name, () => form.reset());
         }}
       >
-        <input name="name" placeholder="Grade name" className="rounded border px-3 py-2 text-sm" />
+        <input name="name" placeholder="اسم المرحلة" className="rounded border px-3 py-2 text-sm" />
         <button disabled={saving} className="inline-flex items-center gap-1 rounded bg-primary px-3 py-2 text-sm text-primary-foreground">
           <Plus className="h-4 w-4" />
-          Add Grade
+          إضافة مرحلة
         </button>
       </form>
       <ul className="space-y-2">
@@ -35,7 +35,7 @@ export function GradesSection({ grades, saving, onCreate, onDelete }: Props) {
             <span>{grade.name}</span>
             <button disabled={saving} className="inline-flex items-center gap-1 text-destructive" onClick={() => onDelete(grade.id)}>
               <Trash2 className="h-4 w-4" />
-              Delete
+              حذف
             </button>
           </li>
         ))}

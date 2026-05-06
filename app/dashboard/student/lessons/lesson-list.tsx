@@ -19,15 +19,15 @@ export function LessonList() {
 
   useEffect(() => {
     fetch("/api/dashboard/student/lessons")
-      .then((res) => (res.ok ? res.json() : Promise.reject(new Error("Failed to load"))))
+      .then((res) => (res.ok ? res.json() : Promise.reject(new Error("فشل التحميل"))))
       .then(setList)
-      .catch(() => setError("Failed to load lessons"))
+      .catch(() => setError("فشل تحميل الدروس"))
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <StatusMessage variant="loading" message="Loading lessons..." />;
+  if (loading) return <StatusMessage variant="loading" message="جاري تحميل الدروس..." />;
   if (error) return <StatusMessage variant="error" message={error} />;
-  if (list.length === 0) return <StatusMessage variant="empty" message="No lessons." />;
+  if (list.length === 0) return <StatusMessage variant="empty" message="لا توجد دروس." />;
 
   return (
     <ul className="space-y-3">
@@ -42,7 +42,7 @@ export function LessonList() {
               href={`/dashboard/student/lessons/${l.id}`}
               className="text-sm text-primary underline"
             >
-              Read
+              قراءة
             </Link>
           </div>
         </li>

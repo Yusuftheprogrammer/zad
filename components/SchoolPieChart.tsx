@@ -31,11 +31,11 @@ type SchoolPieChartProps = {
 export function SchoolPieChart({
   cardTitle,
   cardDescription,
-  valueLabel = "Count",
+  valueLabel = "العدد",
   data,
 }: SchoolPieChartProps) {
   const safeData = data.filter((item) => item.value > 0)
-  const visibleData = safeData.length > 0 ? safeData : [{ label: "No data", value: 1 }]
+  const visibleData = safeData.length > 0 ? safeData : [{ label: "لا توجد بيانات", value: 1 }]
 
   const chartData = visibleData.map((item, index) => ({
     segment: `segment-${index + 1}`,
@@ -48,11 +48,11 @@ export function SchoolPieChart({
     value: {
       label: valueLabel,
     },
-    "segment-1": { label: chartData[0]?.label ?? "Segment 1", color: "var(--chart-1)" },
-    "segment-2": { label: chartData[1]?.label ?? "Segment 2", color: "var(--chart-2)" },
-    "segment-3": { label: chartData[2]?.label ?? "Segment 3", color: "var(--chart-3)" },
-    "segment-4": { label: chartData[3]?.label ?? "Segment 4", color: "var(--chart-4)" },
-    "segment-5": { label: chartData[4]?.label ?? "Segment 5", color: "var(--chart-5)" },
+    "segment-1": { label: chartData[0]?.label ?? "القسم 1", color: "var(--chart-1)" },
+    "segment-2": { label: chartData[1]?.label ?? "القسم 2", color: "var(--chart-2)" },
+    "segment-3": { label: chartData[2]?.label ?? "القسم 3", color: "var(--chart-3)" },
+    "segment-4": { label: chartData[3]?.label ?? "القسم 4", color: "var(--chart-4)" },
+    "segment-5": { label: chartData[4]?.label ?? "القسم 5", color: "var(--chart-5)" },
   } satisfies ChartConfig
 
   const total = safeData.reduce((sum, item) => sum + item.value, 0)
@@ -64,7 +64,7 @@ export function SchoolPieChart({
         {cardDescription ? (
           <CardDescription>{cardDescription}</CardDescription>
         ) : (
-          <CardDescription>{total} total</CardDescription>
+          <CardDescription>{total} إجمالي</CardDescription>
         )}
       </CardHeader>
       <CardContent className="flex-1 pb-4">

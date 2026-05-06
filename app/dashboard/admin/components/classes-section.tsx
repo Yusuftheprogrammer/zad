@@ -14,7 +14,7 @@ type Props = {
 
 export function ClassesSection({ classes, grades, saving, gradeName, onCreate, onDelete }: Props) {
   return (
-    <AdminSection title="Classes">
+    <AdminSection title="الفصول">
       <form
         className="mb-3 flex flex-wrap gap-2"
         onSubmit={(e: FormEvent<HTMLFormElement>) => {
@@ -26,9 +26,9 @@ export function ClassesSection({ classes, grades, saving, gradeName, onCreate, o
           onCreate({ name, gradeId }, () => form.reset());
         }}
       >
-        <input name="name" placeholder="Class name" className="rounded border px-3 py-2 text-sm" />
+        <input name="name" placeholder="اسم الفصل" className="rounded border px-3 py-2 text-sm" />
         <select name="gradeId" className="rounded border px-3 py-2 text-sm">
-          <option value="">Select grade</option>
+          <option value="">اختر المرحلة</option>
           {grades.map((grade) => (
             <option key={grade.id} value={grade.id}>
               {grade.name}
@@ -37,7 +37,7 @@ export function ClassesSection({ classes, grades, saving, gradeName, onCreate, o
         </select>
         <button disabled={saving} className="inline-flex items-center gap-1 rounded bg-primary px-3 py-2 text-sm text-primary-foreground">
           <Plus className="h-4 w-4" />
-          Add Class
+          إضافة فصل
         </button>
       </form>
       <ul className="space-y-2">
@@ -48,7 +48,7 @@ export function ClassesSection({ classes, grades, saving, gradeName, onCreate, o
             </span>
             <button disabled={saving} className="inline-flex items-center gap-1 text-destructive" onClick={() => onDelete(c.id)}>
               <Trash2 className="h-4 w-4" />
-              Delete
+              حذف
             </button>
           </li>
         ))}

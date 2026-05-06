@@ -12,7 +12,7 @@ type Props = {
 
 export function ParentsSection({ parents, saving, onCreate, onDelete }: Props) {
   return (
-    <AdminSection title="Parents">
+    <AdminSection title="أولياء الأمور">
       <form
         className="mb-3 grid gap-2 md:grid-cols-4"
         onSubmit={(e: FormEvent<HTMLFormElement>) => {
@@ -25,23 +25,23 @@ export function ParentsSection({ parents, saving, onCreate, onDelete }: Props) {
           onCreate({ name: name || undefined, email, password }, () => form.reset());
         }}
       >
-        <input name="name" placeholder="Name" className="rounded border px-3 py-2 text-sm" />
-        <input name="email" placeholder="Email" type="email" className="rounded border px-3 py-2 text-sm" />
-        <input name="password" placeholder="Password" type="password" className="rounded border px-3 py-2 text-sm" />
+        <input name="name" placeholder="الاسم" className="rounded border px-3 py-2 text-sm" />
+        <input name="email" placeholder="البريد الإلكتروني" type="email" className="rounded border px-3 py-2 text-sm" />
+        <input name="password" placeholder="كلمة المرور" type="password" className="rounded border px-3 py-2 text-sm" />
         <button disabled={saving} className="inline-flex items-center gap-1 rounded bg-primary px-3 py-2 text-sm text-primary-foreground">
           <Plus className="h-4 w-4" />
-          Add Parent
+          إضافة ولي أمر
         </button>
       </form>
       <ul className="space-y-2">
         {parents.map((parent) => (
           <li key={parent.id} className="flex items-center justify-between rounded border px-3 py-2 text-sm">
             <span>
-              {parent.user.name ?? "Unnamed"} ({parent.user.email})
+              {parent.user.name ?? "بدون اسم"} ({parent.user.email})
             </span>
             <button disabled={saving} className="inline-flex items-center gap-1 text-destructive" onClick={() => onDelete(parent.id)}>
               <Trash2 className="h-4 w-4" />
-              Delete
+              حذف
             </button>
           </li>
         ))}

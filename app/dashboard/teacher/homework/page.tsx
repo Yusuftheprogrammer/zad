@@ -12,8 +12,8 @@ export default async function TeacherHomeworkPage() {
 
   return (
     <div>
-      <h1 className="mb-4 text-xl font-semibold">Homework</h1>
-      <p className="mb-4 text-sm text-muted-foreground">Create and manage homework assignments.</p>
+      <h1 className="mb-4 text-xl font-semibold">الواجبات</h1>
+      <p className="mb-4 text-sm text-muted-foreground">إنشاء الواجبات وإدارتها.</p>
       <TeacherHomeworkList />
     </div>
   );

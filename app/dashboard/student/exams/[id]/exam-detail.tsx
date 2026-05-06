@@ -36,7 +36,7 @@ export function ExamDetail({ examId }: { examId: string }) {
 
   useEffect(() => {
     fetch(`/api/dashboard/student/exams/${examId}`)
-      .then((res) => (res.ok ? res.json() : Promise.reject(new Error("Failed"))))
+      .then((res) => (res.ok ? res.json() : Promise.reject(new Error("فشل التحميل"))))
       .then(setData)
       .catch(() => setData(null))
       .finally(() => setLoading(false));
@@ -64,15 +64,15 @@ export function ExamDetail({ examId }: { examId: string }) {
     });
     setSubmitting(false);
     if (res.ok) {
-      setToast({ type: "success", message: "Exam submitted successfully" });
+      setToast({ type: "success", message: "تم تسليم الاختبار بنجاح" });
       router.refresh();
     } else {
-      setToast({ type: "error", message: "Failed to submit exam" });
+      setToast({ type: "error", message: "فشل تسليم الاختبار" });
     }
   }
 
-  if (loading) return <StatusMessage variant="loading" message="Loading exam..." />;
-  if (!data) return <StatusMessage variant="error" message="Exam not found." />;
+  if (loading) return <StatusMessage variant="loading" message="جاري تحميل الاختبار..." />;
+  if (!data) return <StatusMessage variant="error" message="لم يتم العثور على الاختبار." />;
 
   const { exam, myAttempt, questions } = data;
   let previousAnswers: Record<string, string> = {};
@@ -90,22 +90,22 @@ export function ExamDetail({ examId }: { examId: string }) {
       {toast && <ToastMessage type={toast.type} message={toast.message} onClose={() => setToast(null)} />}
       <h1 className="text-xl font-semibold">{exam.title}</h1>
       <p className="text-muted-foreground">
-        {exam.subject.name} - {exam.durationMinutes} min - Due {new Date(exam.dueDate).toLocaleDateString()}
+        {exam.subject.name} - {exam.durationMinutes} دقيقة - آخر موعد {new Date(exam.dueDate).toLocaleDateString()}
       </p>
       {exam.description && <p>{exam.description}</p>}
 
       {myAttempt && (
         <div className="rounded border bg-muted/50 p-3 text-sm">
-          <strong>Your attempt:</strong> {myAttempt.status}
-          {myAttempt.score != null && ` - Score: ${myAttempt.score}`}
+          <strong>محاولتك:</strong> {myAttempt.status}
+          {myAttempt.score != null && ` - الدرجة: ${myAttempt.score}`}
         </div>
       )}
 
       <form onSubmit={handleSubmit} className="space-y-2">
-        <label className="block text-sm font-medium">Questions</label>
+        <label className="block text-sm font-medium">الأسئلة</label>
         {questions.length === 0 && (
           <p className="rounded border bg-muted/50 p-3 text-sm text-muted-foreground">
-            No MCQ questions available yet.
+            لا توجد أسئلة اختيار من متعدد حتى الآن.
           </p>
         )}
         <div className="space-y-4">
@@ -136,7 +136,7 @@ export function ExamDetail({ examId }: { examId: string }) {
           className="inline-flex items-center gap-2 rounded bg-primary px-4 py-2 text-sm text-primary-foreground disabled:opacity-50"
         >
           {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-          {submitting ? "Submitting..." : "Submit attempt"}
+          {submitting ? "جاري التسليم..." : "تسليم المحاولة"}
         </button>
       </form>
     </div>

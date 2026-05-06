@@ -23,38 +23,40 @@ export default async function DashboardLayout({
         <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4">
           <nav className="flex gap-4 text-sm font-medium">
             <Link href="/dashboard" className="text-muted-foreground hover:text-foreground">
-              Home
+              الرئيسية
             </Link>
             {role === "STUDENT" && (
               <>
-                <Link href="/dashboard/student/homework">Homework</Link>
-                <Link href="/dashboard/student/exams">Exams</Link>
-                <Link href="/dashboard/student/lessons">Lessons</Link>
+                <Link href="/dashboard/student/homework">الواجبات</Link>
+                <Link href="/dashboard/student/exams">الاختبارات</Link>
+                <Link href="/dashboard/student/lessons">الدروس</Link>
               </>
             )}
             {role === "TEACHER" && (
               <>
-                <Link href="/dashboard/teacher/homework">Homework</Link>
-                <Link href="/dashboard/teacher/exams">Exams</Link>
-                <Link href="/dashboard/teacher/lessons">Lessons</Link>
+                <Link href="/dashboard/teacher/homework">الواجبات</Link>
+                <Link href="/dashboard/teacher/exams">الاختبارات</Link>
+                <Link href="/dashboard/teacher/lessons">الدروس</Link>
               </>
             )}
             {role === "ADMIN" && (
               <>
-                <Link href="/dashboard/admin">Admin Panel</Link>
+                <Link href="/dashboard/admin">لوحة الإدارة</Link>
               </>
             )}
           </nav>
           <div className="flex items-center gap-2">
             <ThemeToggle />
             <span className="text-sm text-muted-foreground">{session.user.email}</span>
-            <span className="rounded bg-muted px-2 py-0.5 text-xs">{role}</span>
+            <span className="rounded bg-muted px-2 py-0.5 text-xs">
+              {role === "ADMIN" ? "مشرف" : role === "TEACHER" ? "معلم" : role === "STUDENT" ? "طالب" : role}
+            </span>
             <Link
               href="/api/auth/signout"
               className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
             >
               <LogOut className="h-4 w-4" />
-              Sign out
+              تسجيل الخروج
             </Link>
           </div>
         </div>

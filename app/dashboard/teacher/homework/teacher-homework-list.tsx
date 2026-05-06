@@ -39,12 +39,12 @@ export function TeacherHomeworkList() {
   function load() {
     setError(null);
     fetch("/api/dashboard/teacher/homework-data")
-      .then((r) => (r.ok ? r.json() : Promise.reject(new Error("Failed to load homework data"))))
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error("فشل تحميل بيانات الواجبات"))))
       .then((data: { homework: Homework[]; subjects: TeacherSubjectAssignment[] }) => {
         setHomework(data.homework);
         setSubjects(data.subjects);
       })
-      .catch(() => setError("Failed to load homework data"))
+      .catch(() => setError("فشل تحميل بيانات الواجبات"))
       .finally(() => setLoading(false));
   }
 
@@ -64,7 +64,7 @@ export function TeacherHomeworkList() {
 
     if (!assignment) {
       setCreating(false);
-      setToast({ type: "error", message: "Please select subject and class" });
+      setToast({ type: "error", message: "يرجى اختيار المادة والفصل" });
       return;
     }
 
@@ -82,47 +82,47 @@ export function TeacherHomeworkList() {
     setCreating(false);
     if (res.ok) {
       form.reset();
-      setToast({ type: "success", message: "Homework created successfully" });
+      setToast({ type: "success", message: "تم إنشاء الواجب بنجاح" });
       load();
     } else {
-      setToast({ type: "error", message: "Failed to create homework" });
+      setToast({ type: "error", message: "فشل إنشاء الواجب" });
     }
   }
 
   async function handleDelete(id: string) {
-    if (!confirm("Delete this homework?")) return;
+    if (!confirm("هل تريد حذف هذا الواجب؟")) return;
     setDeletingId(id);
     const res = await fetch(`/api/dashboard/teacher/homework/${id}`, { method: "DELETE" });
     setDeletingId(null);
     if (res.ok) {
-      setToast({ type: "success", message: "Homework deleted successfully" });
+      setToast({ type: "success", message: "تم حذف الواجب بنجاح" });
       load();
     } else {
-      setToast({ type: "error", message: "Failed to delete homework" });
+      setToast({ type: "error", message: "فشل حذف الواجب" });
     }
   }
 
-  if (loading) return <StatusMessage variant="loading" message="Loading homework..." />;
+  if (loading) return <StatusMessage variant="loading" message="جاري تحميل الواجبات..." />;
   if (error) return <StatusMessage variant="error" message={error} />;
 
   return (
     <div className="space-y-6">
       {toast && <ToastMessage type={toast.type} message={toast.message} onClose={() => setToast(null)} />}
       <div className="rounded-lg border bg-card p-4">
-        <h2 className="mb-3 font-medium">Create homework</h2>
+        <h2 className="mb-3 font-medium">إنشاء واجب</h2>
         {subjects.length === 0 ? (
-          <p className="text-sm text-muted-foreground">No assigned subjects found for this teacher.</p>
+          <p className="text-sm text-muted-foreground">لا توجد مواد مسندة لهذا المعلم.</p>
         ) : (
           <form onSubmit={handleCreate} className="flex flex-col gap-3">
             <input
               name="title"
-              placeholder="Title"
+              placeholder="العنوان"
               required
               className="rounded border border-input bg-background px-3 py-2 text-sm"
             />
             <textarea
               name="description"
-              placeholder="Description"
+              placeholder="الوصف"
               rows={2}
               className="rounded border border-input bg-background px-3 py-2 text-sm"
             />
@@ -132,7 +132,7 @@ export function TeacherHomeworkList() {
                 required
                 className="rounded border border-input bg-background px-3 py-2 text-sm"
               >
-                <option value="">Select subject and class</option>
+                <option value="">اختر المادة والفصل</option>
                 {subjects.map((s) => (
                   <option key={s.assignmentId} value={s.assignmentId}>
                     {s.label}
@@ -151,7 +151,7 @@ export function TeacherHomeworkList() {
               className="inline-flex w-fit items-center gap-2 rounded bg-primary px-4 py-2 text-sm text-primary-foreground disabled:opacity-50"
             >
               {creating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
-              {creating ? "Creating..." : "Create"}
+              {creating ? "جاري الإنشاء..." : "إنشاء"}
             </button>
           </form>
         )}
@@ -163,7 +163,7 @@ export function TeacherHomeworkList() {
             <div>
               <h3 className="font-medium">{h.title}</h3>
               <p className="text-sm text-muted-foreground">
-                {h.subject.name} - {h.class.name} - Due {new Date(h.dueDate).toLocaleDateString()} - {h._count.submissions} submissions
+                {h.subject.name} - {h.class.name} - آخر موعد {new Date(h.dueDate).toLocaleDateString()} - {h._count.submissions} تسليم
               </p>
             </div>
             <button
@@ -173,12 +173,12 @@ export function TeacherHomeworkList() {
               className="inline-flex items-center gap-1 text-sm text-destructive hover:underline"
             >
               <Trash2 className="h-4 w-4" />
-              {deletingId === h.id ? "Deleting..." : "Delete"}
+              {deletingId === h.id ? "جاري الحذف..." : "حذف"}
             </button>
           </li>
         ))}
       </ul>
-      {homework.length === 0 && <StatusMessage variant="empty" message="No homework yet." />}
+      {homework.length === 0 && <StatusMessage variant="empty" message="لا توجد واجبات حتى الآن." />}
     </div>
   );
 }

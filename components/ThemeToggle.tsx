@@ -40,11 +40,11 @@ export default function ThemeToggle() {
       <button
         type="button"
         className="rounded border px-2 py-1 text-sm text-muted-foreground"
-        aria-label="Toggle theme"
+        aria-label="تبديل المظهر"
       >
         <span className="inline-flex items-center gap-1">
           <Sun className="h-4 w-4" />
-          Theme
+          المظهر
         </span>
       </button>
     );
@@ -55,11 +55,11 @@ export default function ThemeToggle() {
       type="button"
       onClick={toggleTheme}
       className="inline-flex items-center gap-1 rounded border bg-background px-2 py-1 text-sm text-muted-foreground hover:text-foreground"
-      aria-label="Toggle theme"
-      title={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
+      aria-label="تبديل المظهر"
+      title={`التبديل إلى الوضع ${theme === "dark" ? "الفاتح" : "الداكن"}`}
     >
       {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-      {theme === "dark" ? "Light" : "Dark"}
+      {theme === "dark" ? "فاتح" : "داكن"}
     </button>
   );
 }
