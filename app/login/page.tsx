@@ -14,9 +14,6 @@ export default async function LoginPage() {
       <div className="w-full max-w-sm rounded-lg border bg-card p-6 shadow-sm">
         <h1 className="mb-4 text-xl font-semibold">تسجيل الدخول</h1>
         <LoginForm />
-        <p className="mt-4 text-sm text-muted-foreground">
-          لا تملك حسابًا؟ <a href="/signup" className="text-primary underline">إنشاء حساب</a>
-        </p>
       </div>
     </div>
   );

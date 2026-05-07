@@ -142,16 +142,15 @@ model Homework {
   dueDate     DateTime
 
   subjectId String
-  subject   Subject @relation(fields: [subjectId], references: [id])
+  subject   Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
 
   teacherId String
-  teacher   Teacher @relation(fields: [teacherId], references: [id])
+  teacher   Teacher @relation(fields: [teacherId], references: [id], onDelete: Cascade)
 
   classId String
   class   Class  @relation(fields: [classId], references: [id], onDelete: Cascade)
 
   submissions Submission[]
-  questions   HomeworkQuestion[]
 }
 
 model Submission {
@@ -188,7 +187,6 @@ model Exam {
   class   Class  @relation(fields: [classId], references: [id], onDelete: Cascade)
 
   attempts ExamAttempt[]
-  questions ExamQuestion[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -214,54 +212,6 @@ model ExamAttempt {
   @@unique([examId, studentId])
 }
 
-model McqQuestion {
-  id String @id @default(cuid())
-
-  title           String
-  order           Int
-  numberOfOptions Int @default(4)
-
-  options Options[]
-
-  examQuestions     ExamQuestion[]
-  homeworkQuestions HomeworkQuestion[]
-}
-
-model ExamQuestion {
-  id String @id @default(cuid())
-
-  examId String
-  exam   Exam @relation(fields: [examId], references: [id], onDelete: Cascade)
-
-  questionId String
-  question   McqQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
-
-  order Int
-
-  @@unique([examId, questionId])
-}
-
-model HomeworkQuestion {
-  id String @id @default(cuid())
-
-  homeworkId String
-  homework   Homework @relation(fields: [homeworkId], references: [id], onDelete: Cascade)
-
-  questionId String
-  question   McqQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
-
-  order Int
-
-  @@unique([homeworkId, questionId])
-}
-
-model Options {
-  id         String       @id @default(cuid())
-  title      String
-  isCorrect  Boolean      @default(false)
-  questionId String
-  question   McqQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
-}
 
 /**
  * NextAuth

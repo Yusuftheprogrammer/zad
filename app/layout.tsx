@@ -18,6 +18,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "زاد - أصبح للعلم رواد",
   description: "منصة مدرسية لإدارة الطلاب والمعلمين",
+  icons: {
+    icon: '/icon.png'
+  }
 };
 
 export default function RootLayout({

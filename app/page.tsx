@@ -1,11 +1,16 @@
-/**
- * Home page: links to login and dashboard.
- */
+import Image from "next/image";
+import logo from './icon.png'
+
 export default async function Home() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-6 bg-background p-8">
-      <h1 className="text-2xl font-semibold">Zad</h1>
-      <p className="text-muted-foreground">نظام إدارة المدرسة - خطوة نحو الإدارة الرقمية</p>
+      <Image 
+        src={logo}
+        alt="Logo of the website"
+        className="w-40 h-40 object-contain rounded-full"
+      />
+      <h1 className="text-2xl font-semibold">زاد</h1>
+      <p className="text-muted-foreground">نظام إدارة مدرسة هيئة قناة السويس - خطوة نحو الإدارة الرقمية</p>
       <div className="flex gap-4">
         <a
           href="/login"
