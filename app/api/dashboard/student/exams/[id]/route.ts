@@ -38,16 +38,5 @@ export async function GET(
     },
   });
 
-  const questions = await prisma.mcqQuestion.findMany({
-    where: { examQuestions: { some: { examId: id } } },
-    orderBy: { order: "asc" },
-    include: {
-      options: {
-        orderBy: { id: "asc" },
-        select: { id: true, title: true },
-      },
-    },
-  });
-
-  return Response.json({ exam, myAttempt, questions });
+  return Response.json({ exam, myAttempt });
 }
